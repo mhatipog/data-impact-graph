@@ -147,7 +147,7 @@ def show_change(im,t,snaps):
     paint(d,(495,543),"0–1",font("bold",63),INK)
     polygon_arrow(d,(361,591),(437,591),INK,7)
     paint(d,(86,711),"percent  ->  fraction",font("mono",27),MUTED)
-    paste_screen(im,snaps["change"],(0,130,315,795),(894,137,588,660),t,zoom=.06)
+    paste_screen(im,snaps["change"],(0,130,530,730),(894,137,588,660),t,zoom=.06)
     d=ImageDraw.Draw(im)
     paint(d,(901,821),"REAL APP / SOURCE ASSET SELECTED",font("mono",20),MUTED)
 def show_path(im,t,snaps):
@@ -184,13 +184,13 @@ def show_finance(im,t,snaps):
     squiggle(d,84,560,468,ORANGE,(t-.4)/1.4,7)
     paint(d,(86,620),"Dry kilograms set the",font("sans",32),SOFT)
     paint(d,(86,671),"settlement volume.",font("sans",32),SOFT)
-    paste_screen(im,snaps["finance"],(325,205,1555,805),(675,169,848,615),t,.05)
+    paste_screen(im,snaps["finance"],(400,205,1240,815),(675,169,848,615),t,.05)
     d=ImageDraw.Draw(im)
     note(d,"Not just a quality metric.",875,805,ORANGE,37)
 def show_climate(im,t,snaps):
     d=ImageDraw.Draw(im)
     paint(d,(84,67),"SECOND  /  the carbon report",font("mono",23),(51,124,117))
-    paste_screen(im,snaps["climate"],(340,295,1568,810),(69,171,988,589),t,.055)
+    paste_screen(im,snaps["climate"],(450,235,1450,829),(69,171,988,589),t,.055)
     d=ImageDraw.Draw(im)
     paint(d,(1100,210),"Scope 3",font("serifbold",71),INK)
     squiggle(d,1102,307,382,ORANGE,(t-.3)/1.3,7)
@@ -217,7 +217,7 @@ def show_negative(im,t,snaps):
         for y in (347,462):
             d.line((1019,y,1085,y+80),fill=RED,width=9)
             d.line((1085,y,1019,y+80),fill=RED,width=9)
-    paste_screen(im,snaps["negative"],(350,345,1545,795),(84,607,936,216),t,.025)
+    paste_screen(im,snaps["negative"],(350,395,1560,675),(84,607,936,216),t,.025)
     d=ImageDraw.Draw(im)
     paint(d,(1056,663),"No unrelated",font("serif",43),WHITE)
     paint(d,(1056,715),"false positives.",font("serif",43),WHITE)

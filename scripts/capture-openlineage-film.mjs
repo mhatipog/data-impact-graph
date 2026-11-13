@@ -75,8 +75,8 @@ try{
  assert(receipt.includes('co2e_per_dry_tonne')&&receipt.includes('payout_eur'));
  assert(receipt.includes('Relate path'));
  await page.locator('#search').fill('field_id');
- await page.locator('#suggestions .suggestion').filter({hasText:'field_id'}).first().click();
- await page.waitForFunction(()=>document.querySelector('#focus-title')?.textContent==='field_id');
+ await page.locator('#suggestions .suggestion').filter({hasText:'raw_harvests #field_id'}).click();
+ await page.waitForFunction((id)=>document.querySelector('#focus-subtitle')?.textContent?.includes(id),fieldId.id);
  await shot('negative-route','.work-card');
  await shot('negative-evidence','.path-panel');
  assert.deepEqual(errors,[]);

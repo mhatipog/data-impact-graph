@@ -120,9 +120,9 @@ try {
   const video = page.video();
   await page.close();
   await context.close();
-  await browser.close();
   const raw = path.join(output,'recorded.webm');
   await video.saveAs(raw);
+  await browser.close();
   const mp4 = path.join(output,'data-impact-graph-demo.mp4');
   const ff = spawnSync(ffmpegBinary.path, [
     '-hide_banner','-loglevel','error','-y','-i',raw,

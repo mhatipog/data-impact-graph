@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-13",
+  "engine": "Relate (native embedded Python)",
+  "assets": 49,
+  "relationships": 60,
+  "source": "live local Relate + Playwright",
+  "duration_seconds": 99.28999999999999,
+  "video_bytes": 2252240,
+  "receipt_bytes": 9538,
+  "output_ids": [
+    "metric.quality",
+    "dash.exec",
+    "metric.payout",
+    "metric.carbon",
+    "dash.supplier",
+    "metric.margin",
+    "dash.esg"
+  ],
+  "verified_negative_control": true,
+  "errors": []
+}

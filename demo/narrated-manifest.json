@@ -5,8 +5,8 @@
   "framerate": 30,
   "voice": "en-US-AndrewNeural",
   "voice_engine": "Microsoft Edge Neural TTS",
-  "video_bytes": 5045399,
-  "sha256": "fd962f4188d6bb5e29c1fef80d6b4e906f68c180b6008e9e77887cfd2d0610b6",
+  "video_bytes": 5045502,
+  "sha256": "bed52d8b2621e6cf2b5ef80211222fc0120461ea516bee35a986460076faa898",
   "chapters": [
     {
       "key": "hook",

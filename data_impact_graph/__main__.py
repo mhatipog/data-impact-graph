@@ -3,14 +3,15 @@ import argparse
 import json
 from pathlib import Path
 
-from .core import SAMPLE, STORE, impact, overview, seed
+from .core import SAMPLE, STORE, impact, overview, receipt, seed
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Column-aware data impact analysis, powered by Relate")
-    parser.add_argument("command", nargs="?", choices=("serve", "seed", "impact", "overview"), default="serve")
+    parser.add_argument("command", nargs="?", choices=("serve", "seed", "impact", "overview", "report"), default="serve")
     parser.add_argument("asset", nargs="?", default="lab.assays.moisture_pct")
     parser.add_argument("--upstream", action="store_true")
+    parser.add_argument("--change", default="", help="Optional reviewer-supplied change note")
     parser.add_argument("--force", action="store_true")
     parser.add_argument("--store", type=Path, default=STORE)
     parser.add_argument("--metadata", type=Path, default=SAMPLE)
@@ -20,6 +21,8 @@ def main() -> None:
         print(json.dumps(seed(args.metadata, args.store, force=args.force), indent=2))
     elif args.command == "impact":
         print(json.dumps(impact(args.asset, "upstream" if args.upstream else "downstream", args.store), indent=2))
+    elif args.command == "report":
+        print(receipt(args.asset, "upstream" if args.upstream else "downstream", args.store, args.change))
     elif args.command == "overview":
         print(json.dumps(overview(args.store), indent=2))
     else:

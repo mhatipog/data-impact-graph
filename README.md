@@ -31,11 +31,11 @@ The reverse traversal uses `<-[:FLOWS_TO*1..12]-`. The JSON API includes the ret
 
 **Your existing instrumentation is the source of truth.** Import standard OpenLineage JSON or JSONL events from Spark, Airflow, dbt, or another producer into a separate embedded Relate graph, then explore real dataset and field dependencies without running a metadata server.
 
-\`\`\`bash
+```bash
 python -m data_impact_graph import openlineage examples/openlineage-events.jsonl \
   --store data/openlineage.rl
 python -m data_impact_graph serve --store data/openlineage.rl
-\`\`\`
+```
 
 The importer recognizes explicit Column Lineage, newer Job Lineage and Dataset Lineage facets. It retains schema inventory but **does not invent** input-to-output relationships from bare job boundaries, and it incrementally replaces older known mappings on later successful runs. Repeat an import safely: unchanged events are idempotent. The included events are synthetic and intended to test the OpenLineage-compatible workflow; point it at your own producer exports for real lineage.
 
@@ -122,10 +122,10 @@ The main film is a deliberately edited product story: a lab field changes units,
 
 Regenerate the edited film (Python 3.12, FFmpeg, Debian/Ubuntu fonts and neural TTS connectivity):
 
-\`\`\`bash
+```bash
 python -m pip install -r requirements-video.txt
 python scripts/render-story-demo.py
-\`\`\`
+```
 
 Regenerate the underlying Playwright recording separately using [the capture script](scripts/record-demo.mjs); see [DEMO.md](DEMO.md). The app's native Relate integration and eight tests do not depend on voice or video tooling.
 

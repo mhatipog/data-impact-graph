@@ -38,7 +38,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add demo/data-impact-graph-narrated.mp4 demo/narrated-manifest.json
+          git add demo/data-impact-graph-narrated.mp4 demo/narrated-manifest.json demo/narrated-contact-sheet.png
           git diff --cached --quiet && exit 0
           git commit -m "demo: publish narrated 1080p editorial walkthrough [skip video]"
           git push origin HEAD:refs/heads/video/editorial-narrated-v2

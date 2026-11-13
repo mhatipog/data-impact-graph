@@ -376,10 +376,10 @@ async def main():
         cmd("ffmpeg","-hide_banner","-loglevel","error","-y",
             "-i",str(assembled),"-i",str(soundtrack),
             "-filter_complex",
-            "[0:a]aformat=sample_rates=44100:channel_layouts=stereo[speech];"
+            "[0:a]aformat=sample_rates=44100:channel_layouts=stereo,asplit=2[speechsc][speechmix];"
             "[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=0.36[score];"
-            "[score][speech]sidechaincompress=threshold=0.020:ratio=6:attack=22:release=380[duck];"
-            "[speech][duck]amix=inputs=2:duration=first:weights='1 0.46':normalize=0,"
+            "[score][speechsc]sidechaincompress=threshold=0.020:ratio=6:attack=22:release=380[duck];"
+            "[speechmix][duck]amix=inputs=2:duration=first:weights='1 0.46':normalize=0,"
             "alimiter=limit=0.94[a]",
             "-map","0:v:0","-map","[a]","-c:v","copy",
             "-c:a","aac","-b:a","192k","-movflags","+faststart",str(OUT))

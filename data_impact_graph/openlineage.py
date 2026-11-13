@@ -240,6 +240,19 @@ def _normalize(event, state):
         raise ValueError("OpenLineage event must be RunEvent, JobEvent or DatasetEvent")
     digest = _fingerprint(event)
     changed = 0
+    # Record inventory without claiming any input-to-output flow. In
+    # particular, a RunEvent without explicit lineage is *not* a graph edge.
+    inventory = _Graph()
+    if job_id is not None:
+        inventory.asset("JOB", namespace, name)
+        for ds in inputs + outputs:
+            ds_ns, ds_name = _identity(ds, "dataset")
+            inventory.asset("DATASET", ds_ns, ds_name)
+        owner = "inventory:" + job_id
+    else:
+        inventory.asset("DATASET", namespace, name)
+        owner = "inventory:" + _ident("ds", namespace, name)
+    changed += int(_record(state, owner, timestamp, inventory, digest))
     for ds in inputs + outputs:
         _identity(ds, "dataset")
         facets = ds.get("facets") or {}
@@ -384,6 +397,7 @@ def import_openlineage(source, store_path=DEFAULT_STORE, *, replace=False):
             with relate.connect(str(candidate)) as db:
                 db.execute("CREATE (:OpenLineageState {payload: $payload})",
                            {"payload": json.dumps(state, separators=(",", ":"), ensure_ascii=False)})
+                db.commit()
             os.replace(candidate, store)
         return {"store": str(store), "events": len(events), "accepted": seen,
                 "ignored": skipped, "updated_snapshots": updates,

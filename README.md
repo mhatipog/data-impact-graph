@@ -98,9 +98,21 @@ relate --database ./data/sample.rl --read-only \
 
 **Boundary:** synthetic, illustrative dependency metadata. The demo does not ingest production catalog APIs, predict the probability of breakage or execute arbitrary Cypher supplied by visitors. The server binds only `127.0.0.1` and exposes read-only graph queries. Paths are capped at 12 hops / 600 matches to bound work.
 
-## Demo
+## Recorded demo (Oracle OCI)
 
-See [`DEMO.md`](DEMO.md) for a 90-second screen-recording script and [`SUBMISSION.md`](SUBMISSION.md) for a draft Devpost description and recording checklist. The attached Relate snapshot was created and verified on an Oracle Cloud ARM64 self-hosted runner, with 8 native integration tests (including receipt evidence and negative-control semantics). A static mock is **not** used at runtime.
+[**Watch / download the 99-second MP4**](demo/data-impact-graph-demo.mp4) · [Preview image](demo/poster.png) · [Real impact receipt](demo/impact-review.md) · [Capture manifest](demo/manifest.json).
+
+Recorded with Playwright driving the **actual local Relate-backed app** on our Oracle ARM64 runner, encoded with FFmpeg, with on-screen explanatory captions and no voice track. The video is a generated recording, not a hand-operated screen capture or UI mock. The checks exercised both business-impact routes, a negative control and receipt download. [Capture source](scripts/record-demo.mjs) is included for regeneration.
+
+To regenerate the recording from a running app (on a system with Node 22, Playwright Chromium libraries and FFmpeg's npm ARM64 binary):
+
+```bash
+npm install --no-save --no-package-lock playwright@1.63.0 @ffmpeg-installer/ffmpeg@1.1.0
+npx playwright install chromium --only-shell
+node scripts/record-demo.mjs demo/output
+```
+
+See [`DEMO.md`](DEMO.md) for the ~100-second screen-recording script and [`SUBMISSION.md`](SUBMISSION.md) for a draft Devpost description and recording checklist. The attached Relate snapshot was created and verified on an Oracle Cloud ARM64 self-hosted runner, with 8 native integration tests (including receipt evidence and negative-control semantics). A static mock is **not** used at runtime.
 
 ## AI-assisted development
 

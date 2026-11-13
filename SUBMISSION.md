@@ -12,4 +12,6 @@
 
 **Technology:** Python standard-library HTTP server, `relate-db==1.0.1`, Cypher, SVG, vanilla JavaScript/CSS, optional Relate CLI MCP. AI coding assistance from ChatGPT was used during implementation, but inference is not part of the runtime experience. The implementation and data are Apache-2.0 licensed.
 
-**Remaining before Devpost submission:** record a real 1–2 minute demo video; take a screenshot from the live local app (not from a UI fixture); verify the optional Relate CLI MCP connection if demonstrating it; join and publish the entry on Devpost. There is **no published video or submitted entry** just because this draft exists.
+**Recorded video:** [99-second Playwright walkthrough](demo/data-impact-graph-demo.mp4) (generated on Oracle OCI from the real application; visual captions, no voiceover). [Live-app poster](demo/poster.png) · [actual downloaded receipt](demo/impact-review.md) · [verified capture manifest](demo/manifest.json).
+
+**Remaining before Devpost submission:** upload/host the MP4 in whatever player Devpost accepts; attach its URL; review the video visually; join and publish the entry. The GitHub MP4 is real and public, but this draft is **not** a submitted Devpost entry.

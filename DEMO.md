@@ -1,4 +1,8 @@
-# 90-second Data Impact Graph demo — recording script
+# Data Impact Graph — 99-second recorded demo and storyboard
+
+**Recorded MP4:** [demo/data-impact-graph-demo.mp4](demo/data-impact-graph-demo.mp4) · [Capture manifest](demo/manifest.json) · [Automated Playwright source](scripts/record-demo.mjs).
+
+The verified 99.29-second capture was made on an Oracle ARM64 self-hosted runner against the real Relate graph; captions replace narration. The timings below are approximate scene targets, not proof of exact cut times.
 
 Film a **real local run** after cloning (Relate is the backend). A screen capture with narration is enough; no proprietary data, logins or cloud services. Use a 1440px-wide browser and keep the evidence panel visible.
 
@@ -21,4 +25,4 @@ relate --database data/sample.rl --read-only "MATCH (n:Asset) RETURN count(n) AS
 
 “Clone once, run locally, inspect one file. Agents can ask the same graph through Relate’s read-only MCP server.” Finish on the application and public repository URL.
 
-Do not claim the sample is a production catalog, that these dependencies prove runtime failure, or that the optional MCP mode was tested unless separately verified. Record and host the actual video publicly before submitting to Devpost.
+Do not claim the sample is a production catalog, that these dependencies prove runtime failure, or that the optional MCP mode was tested unless separately verified. The actual MP4 is committed publicly under `demo/`. Devpost may still require uploading it to a supported video host and adding its URL to the submission.

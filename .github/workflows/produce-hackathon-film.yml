@@ -7,6 +7,8 @@ on:
       - 'scripts/instrumented-pipeline.py'
       - 'scripts/capture-openlineage-film.mjs'
       - 'scripts/preview-openlineage-captures.py'
+      - 'scripts/render-openlineage-film.py'
+      - 'scripts/original-story-score.py'
       - 'requirements-hackathon-video.txt'
       - '.github/workflows/produce-hackathon-film.yml'
   workflow_dispatch:
@@ -18,7 +20,7 @@ jobs:
   producer-and-browser:
     if: "!contains(github.event.head_commit.message, '[skip film]')"
     runs-on: ubuntu-latest
-    timeout-minutes: 22
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
         with:
@@ -76,13 +78,20 @@ jobs:
           PY
           node scripts/capture-openlineage-film.mjs demo/film-working
           python scripts/preview-openlineage-captures.py
-      - name: Publish reviewable captures without Actions artifacts
+      - name: Edit final 1080p film with neural voice and original soundtrack
+        run: |
+          python scripts/render-openlineage-film.py --work demo/film-working
+          test -s demo/data-impact-graph-openlineage-film.mp4
+          test -s demo/openlineage-film-contact-sheet.png
+          test -s demo/openlineage-film-manifest.json
+          ffprobe -v error -show_entries stream=codec_name,codec_type -of compact demo/data-impact-graph-openlineage-film.mp4
+      - name: Publish final video and evidence without Actions artifacts
         run: |
           cp demo/film-working/instrumented-openlineage.jsonl examples/openlineage-sdk-emitted.jsonl
           cp demo/film-working/instrumented-run.json demo/openlineage-sdk-run-proof.json
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add examples/openlineage-sdk-emitted.jsonl demo/openlineage-sdk-run-proof.json demo/openlineage-browser-contact-sheet.png
+          git add examples/openlineage-sdk-emitted.jsonl demo/openlineage-sdk-run-proof.json demo/openlineage-browser-contact-sheet.png demo/data-impact-graph-openlineage-film.mp4 demo/openlineage-film-contact-sheet.png demo/openlineage-film-manifest.json
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m "demo: publish verified OpenLineage SDK and real-app capture evidence [skip film]"
+          git commit -m "demo: publish final OpenLineage journey film and source evidence [skip film]"
           git push origin HEAD:refs/heads/video/openlineage-real-workflow-v4

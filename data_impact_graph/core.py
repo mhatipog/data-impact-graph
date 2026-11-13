@@ -31,25 +31,24 @@ def validate(metadata: dict) -> None:
         if (a, b) in pairs:
             raise ValueError(f"Duplicate flow: {a} -> {b}")
         pairs.add((a, b))
-    # Bound path enumeration by requiring a DAG: back-edges are import errors.
-    adjacent = {a: [] for a in ids}
+    # Reject dependency cycles without recursive DFS depth failures on long
+    # lineage chains. The embedded Cypher traversal is deliberately bounded.
+    adjacent = {asset_id: [] for asset_id in ids}
+    indegree = {asset_id: 0 for asset_id in ids}
     for edge in edges:
         adjacent[edge["from"]].append(edge["to"])
-    visiting, visited = set(), set()
-
-    def dfs(node):
-        if node in visiting:
-            raise ValueError(f"Dependency cycle through {node}")
-        if node in visited:
-            return
-        visiting.add(node)
-        for nxt in adjacent[node]:
-            dfs(nxt)
-        visiting.remove(node)
-        visited.add(node)
-
-    for asset_id in ids:
-        dfs(asset_id)
+        indegree[edge["to"]] += 1
+    queue = [asset_id for asset_id in ids if indegree[asset_id] == 0]
+    cursor = 0
+    while cursor < len(queue):
+        asset_id = queue[cursor]
+        cursor += 1
+        for target in adjacent[asset_id]:
+            indegree[target] -= 1
+            if indegree[target] == 0:
+                queue.append(target)
+    if cursor != len(ids):
+        raise ValueError("Dependency cycle detected in imported graph")
 
 
 def seed(metadata_path: Path = SAMPLE, store_path: Path = STORE, *, force: bool = False) -> dict:

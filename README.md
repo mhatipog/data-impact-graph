@@ -98,21 +98,22 @@ relate --database ./data/sample.rl --read-only \
 
 **Boundary:** synthetic, illustrative dependency metadata. The demo does not ingest production catalog APIs, predict the probability of breakage or execute arbitrary Cypher supplied by visitors. The server binds only `127.0.0.1` and exposes read-only graph queries. Paths are capped at 12 hops / 600 matches to bound work.
 
-## Recorded demo (Oracle OCI)
+## Recorded demo — story-first edition
 
-[**Watch / download the 99-second MP4**](demo/data-impact-graph-demo.mp4) · [Preview image](demo/poster.png) · [Real impact receipt](demo/impact-review.md) · [Capture manifest](demo/manifest.json).
+[**Watch/download the narrated 83-second film**](demo/data-impact-graph-story.mp4) · [Nine-scene frame review](demo/story-contact-sheet.png) · [Render and soundtrack manifest](demo/story-manifest.json).
 
-Recorded with Playwright driving the **actual local Relate-backed app** on our Oracle ARM64 runner, encoded with FFmpeg, with on-screen explanatory captions and no voice track. The video is a generated recording, not a hand-operated screen capture or UI mock. The checks exercised both business-impact routes, a negative control and receipt download. [Capture source](scripts/record-demo.mjs) is included for regeneration.
+The main film is a deliberately edited product story: a lab field changes units, Relate follows the dependency path into shared dry mass, and two unexpected business outputs appear — supplier payouts and Scope 3 carbon reporting. It has an English neural voiceover, original 102 BPM electronic score with transitions and speech ducking, drawn callouts, varying editorial typography, distinct intro/outro, and selected close-ups of the **real** Relate-backed application. Illustrative graphics are separated from genuine app screenshots. The facts are checked against the generated [impact receipt](demo/impact-review.md). All data is fictional.
 
-To regenerate the recording from a running app (on a system with Node 22, Playwright Chromium libraries and FFmpeg's npm ARM64 binary):
+**Technical evidence:** [original 99-second Playwright recording](demo/data-impact-graph-demo.mp4) · [original poster](demo/poster.png) · [original capture manifest](demo/manifest.json). This unedited recording was captured on Oracle OCI against the actual embedded Relate graph, not mocked endpoints. It verifies the real workflow and negative-control check; the newer film is for clearer presentation.
 
-```bash
-npm install --no-save --no-package-lock playwright@1.63.0 @ffmpeg-installer/ffmpeg@1.1.0
-npx playwright install chromium --only-shell
-node scripts/record-demo.mjs demo/output
-```
+Regenerate the edited film (Python 3.12, FFmpeg, Debian/Ubuntu fonts and neural TTS connectivity):
 
-See [`DEMO.md`](DEMO.md) for the ~100-second screen-recording script and [`SUBMISSION.md`](SUBMISSION.md) for a draft Devpost description and recording checklist. The attached Relate snapshot was created and verified on an Oracle Cloud ARM64 self-hosted runner, with 8 native integration tests (including receipt evidence and negative-control semantics). A static mock is **not** used at runtime.
+\`\`\`bash
+python -m pip install -r requirements-video.txt
+python scripts/render-story-demo.py
+\`\`\`
+
+Regenerate the underlying Playwright recording separately using [the capture script](scripts/record-demo.mjs); see [DEMO.md](DEMO.md). The app's native Relate integration and eight tests do not depend on voice or video tooling.
 
 ## AI-assisted development
 

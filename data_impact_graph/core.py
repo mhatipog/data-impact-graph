@@ -117,7 +117,7 @@ def impact(asset_id: str, direction: str = "downstream", store_path: Path = STOR
         query = f"MATCH p = (root:Asset {{id: $id}})<-[:FLOWS_TO*1..{MAX_HOPS}]-(target:Asset) RETURN p ORDER BY length(p) ASC LIMIT {MAX_PATHS}"
     targets: dict[str, dict] = {}
     with relate.connect(str(store_path), read_only=True) as db:
-        origin = db.execute("MATCH (a:Asset {id: $id}) RETURN a", {"id": asset_id}).single()
+        origin = db.execute("MATCH (a:Asset {id: $id}) RETURN a", {"id": asset_id}).fetchone()
         if origin is None:
             raise KeyError(asset_id)
         source = _asset(origin["a"])

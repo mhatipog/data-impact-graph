@@ -206,5 +206,60 @@ class OpenLineageTests(unittest.TestCase):
             import_openlineage(self.file, STORE, replace=True)
 
 
+    def test_modern_field_lineage_overrides_conflicting_legacy_facet(self):
+        latest = mapped("dual", "raw.old", "marts.result", "amount", "wrong")
+        latest["inputs"].append(dataset("raw.correct", ["actual"]))
+        latest["job"]["facets"] = {"lineage": {"entries": [
+            {"type": "DATASET", "namespace": NS, "name": "marts.result",
+             "fields": {"amount": {"inputs": [
+                 {"type": "DATASET", "namespace": NS,
+                  "name": "raw.correct", "field": "actual"}
+             ]}}}
+        ]}}
+        latest["producer"] = "https://example.org/producer"
+        self.ingest([latest])
+        graph = overview(self.store)
+        good = _ident("col", NS, "raw.correct", "actual")
+        wrong = _ident("col", NS, "raw.old", "wrong")
+        target = _ident("col", NS, "marts.result", "amount")
+        self.assertIn(target, {a["id"] for a in impact(good, store_path=self.store)["affected"]})
+        self.assertNotIn((wrong, target),
+                         {(edge["source"], edge["target"]) for edge in graph["flows"]})
+        evidence = next(edge for edge in graph["flows"] if edge["source"] == good)
+        self.assertIn("producer", evidence["provenance"])
+        self.assertIn("2026-11-01", evidence["provenance"])
+
+    def test_unmapped_run_creates_inventory_without_dependency_claims(self):
+        source = event("unknown",
+                       [dataset("raw.customer", ["id"])],
+                       [dataset("marts.unmapped", ["total"])])
+        self.ingest([source])
+        graph = overview(self.store)
+        names = {asset["name"] for asset in graph["assets"]}
+        self.assertIn("raw.customer", names)
+        self.assertIn("marts.unmapped", names)
+        self.assertIn("unknown", names)
+        self.assertFalse(any(flow["mode"] != "scope" for flow in graph["flows"]))
+        source_id = _ident("col", NS, "raw.customer", "id")
+        self.assertFalse(impact(source_id, store_path=self.store)["affected"])
+
+    def test_dataset_wide_column_dependency_propagates_without_sibling_leakage(self):
+        ev = event("filter",
+                   [dataset("raw.orders", ["amount", "region"])],
+                   [dataset("marts.region_sales", ["total"],
+                            {"fields": {}, "dataset": [
+                                {"namespace": NS, "name": "raw.orders",
+                                 "field": "region", "transformations": [
+                                     {"type": "INDIRECT", "subtype": "FILTER"}
+                                 ]}
+                            ]})])
+        self.ingest([ev])
+        region = _ident("col", NS, "raw.orders", "region")
+        amount = _ident("col", NS, "raw.orders", "amount")
+        target = _ident("col", NS, "marts.region_sales", "total")
+        self.assertIn(target, {a["id"] for a in impact(region, store_path=self.store)["affected"]})
+        self.assertNotIn(target, {a["id"] for a in impact(amount, store_path=self.store)["affected"]})
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -14,12 +14,12 @@ const graph=await get('/api/graph');
 const health=await get('/api/health');
 assert.equal(graph.source,'openlineage');
 assert.equal(health.ok,true);
-const find=(name,kind='Column')=>{
-  const hits=graph.assets.filter(a=>a.name===name&&a.kind===kind);
+const find=(name,kind='Column',dataset=null)=>{
+  const hits=graph.assets.filter(a=>a.name===name&&a.kind===kind&&(!dataset||a.detail.includes(' / '+dataset+' #')));
   assert(hits.length===1,'Expected a unique '+name+' ('+kind+'), found '+hits.length);
   return hits[0];
 };
-const moisture=find('moisture_pct'),fieldId=find('field_id');
+const moisture=find('moisture_pct'),fieldId=find('field_id','Column','raw_harvests');
 const impact=await get('/api/impact?id='+encodeURIComponent(moisture.id));
 const payout=find('payout_eur'),carbon=find('co2e_per_dry_tonne');
 const ids=new Set(impact.affected.map(a=>a.id));

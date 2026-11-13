@@ -154,7 +154,7 @@ def show_path(im,t,snaps):
     d=ImageDraw.Draw(im)
     paint(d,(70,53),"Not a guess. A Cypher traversal.",font("serifbold",66),WHITE)
     note(d,"Look closely...",1103,92,ORANGE,39)
-    paste_screen(im,snaps["path"],(340,320,1568,817),(85,183,1434,588),t,zoom=.075)
+    paste_screen(im,snaps["path"],(340,218,1568,721),(85,183,1434,588),t,zoom=.075)
     d=ImageDraw.Draw(im)
     x=int(145+round(1120*ease((t-.4)/2.2)))
     squiggle(d,144,786,min(1250,x-144),ORANGE,1,7)
@@ -169,10 +169,10 @@ def show_fork(im,t):
     line_progress(d,[(800,362),(800,427),(1118,427),(1118,506)],TEAL,8,(t-.7)/2.0)
     if t>1.6:
         graph_box(d,(119,508,677,181),"FinanceMart","payable dry kg  ->  payout forecast",ORANGE,"serif")
-        paint(d,(157,595),"Money",font("serifbold",75),INK)
+        paint(d,(157,566),"Money",font("serifbold",70),INK)
     if t>2.2:
         graph_box(d,(850,508,629,181),"ClimateMart","dry tonnes  ->  carbon intensity",TEAL,"serif")
-        paint(d,(910,595),"Carbon",font("serifbold",75),INK)
+        paint(d,(910,566),"Carbon",font("serifbold",70),INK)
     paint(d,(88,780),"One intermediate. Two departments that rarely share a dashboard.",font("sans",31),INK)
     squiggle(d,992,824,381,ORANGE,(t-2.2)/1.4,5)
 def show_finance(im,t,snaps):
@@ -217,7 +217,7 @@ def show_negative(im,t,snaps):
         for y in (347,462):
             d.line((1019,y,1085,y+80),fill=RED,width=9)
             d.line((1085,y,1019,y+80),fill=RED,width=9)
-    paste_screen(im,snaps["negative"],(350,395,1560,675),(84,607,936,216),t,.025)
+    paste_screen(im,snaps["negative"],(350,535,1560,815),(84,607,936,216),t,.025)
     d=ImageDraw.Draw(im)
     paint(d,(1056,663),"No unrelated",font("serif",43),WHITE)
     paint(d,(1056,715),"false positives.",font("serif",43),WHITE)

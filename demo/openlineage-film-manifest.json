@@ -3,7 +3,7 @@
   "source": "executed SQLite ETL + official OpenLineage SDK + native Relate + real Playwright browser",
   "source_data": "fictional sample lots; no customer data",
   "events_generated_by_sdk": 10,
-  "event_sha256": "c2c24e50247235c51900c99c29a551ffcf5870b292cd2a9a0b2a6ed4c4670986",
+  "event_sha256": "b44a5be529e91db37ce80a7b058beb645f21460c4eff09b0f915db4ad3e2b4d8",
   "replay_idempotent": true,
   "browser_assertions": "Playwright screenshots of the real local app, live Relate API",
   "native_paths": {
@@ -31,8 +31,8 @@
   "duration_seconds": 105.712993,
   "fps": 24,
   "resolution": "1920x1080",
-  "video_bytes": 4621221,
-  "sha256": "71b4d6f81e33bebfeeb0387fc020a060ccdd01cc2e097f1bd0aa29cbc5c15fd4",
+  "video_bytes": 4533094,
+  "sha256": "6c5fbbfac886eed0a0a5cc0ab379d4287b10b4c11da30813a2545be4ef52df60",
   "scenes": [
     {
       "name": "hook",

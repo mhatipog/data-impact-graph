@@ -16,6 +16,10 @@ import math
 from pathlib import Path
 import subprocess
 import tempfile
+import sys
+
+# Allow direct execution from scripts/ without requiring a pip editable install.
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 
 import edge_tts
 from PIL import Image, ImageDraw, ImageFont, ImageOps

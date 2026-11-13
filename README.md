@@ -4,6 +4,8 @@
 
 A local, dependency-aware lineage explorer for data engineers, built for the [Relate by Neo4j Hackathon](https://relate.devpost.com/). No API keys, graph server, LLM, frontend build or paid services. The bundled example is fictional; you can also import lineage from your own OpenLineage events.
 
+**Watch the current 1:46 hackathon film:** [Before the Merge — OpenLineage → Relate → impact review](demo/data-impact-graph-openlineage-film.mp4) · [10-frame preview](demo/openlineage-film-contact-sheet.png) · [Captions](demo/data-impact-graph-openlineage-film.srt). The video uses SDK-emitted events from actual executed SQLite SQL, a native Relate graph, and real Playwright UI captures. The underlying data is synthetic.
+
 ## Use case
 
 You discover that `LabTrack.lot_assays.moisture_pct` is changing from a percentage to a fraction. What will break? A keyword search might find a quality check, but miss **supplier payout** and **Scope 3 carbon intensity**. Both secretly share a dry-mass adjustment.
@@ -112,22 +114,15 @@ relate --database ./data/sample.rl --read-only \
 
 **Boundary:** synthetic, illustrative dependency metadata. The demo does not ingest production catalog APIs, predict the probability of breakage or execute arbitrary Cypher supplied by visitors. The server binds only `127.0.0.1` and exposes read-only graph queries. Paths are capped at 12 hops / 600 matches to bound work.
 
-## Recorded demo — story-first edition
+## Recorded demo — real OpenLineage workflow
 
-[**Watch/download the narrated 83-second film**](demo/data-impact-graph-story.mp4) · [Nine-scene frame review](demo/story-contact-sheet.png) · [Render and soundtrack manifest](demo/story-manifest.json).
+**Primary film (1 min 46 sec):** [Watch / download MP4](demo/data-impact-graph-openlineage-film.mp4) · [Scene preview](demo/openlineage-film-contact-sheet.png) · [Subtitle file](demo/data-impact-graph-openlineage-film.srt) · [verified media manifest](demo/openlineage-film-manifest.json).
 
-The main film is a deliberately edited product story: a lab field changes units, Relate follows the dependency path into shared dry mass, and two unexpected business outputs appear — supplier payouts and Scope 3 carbon reporting. It has an English neural voiceover, original 102 BPM electronic score with transitions and speech ducking, drawn callouts, varying editorial typography, distinct intro/outro, and selected close-ups of the **real** Relate-backed application. Illustrative graphics are separated from genuine app screenshots. The facts are checked against the generated [impact receipt](demo/impact-review.md). All data is fictional.
+The film starts when a developer is reviewing a data-contract change, not with a fabricated network diagram. An instrumented local SQL pipeline **actually executes** its transformations. The official OpenLineage Python SDK emits schema and column-lineage facets from those SQL expressions. Data Impact Graph imports the resulting events into a local embedded Relate store and traverses the finance and carbon-intensity dependencies with real Cypher. A second field demonstrates how missing links should not become invented impacts. Finally, the live app exports a review receipt.
 
-**Technical evidence:** [original 99-second Playwright recording](demo/data-impact-graph-demo.mp4) · [original poster](demo/poster.png) · [original capture manifest](demo/manifest.json). This unedited recording was captured on Oracle OCI against the actual embedded Relate graph, not mocked endpoints. It verifies the real workflow and negative-control check; the newer film is for clearer presentation.
+**Evidence and reproducibility:** [Film production guide](FILM.md) · [SDK-emitted events](examples/openlineage-sdk-emitted.jsonl) · [actual local SQL producer](scripts/instrumented-pipeline.py) · [real browser capture](demo/openlineage-browser-contact-sheet.png) · [native tests](tests/test_openlineage.py). The producer uses fictional input records; it is not a direct Fabric, Databricks or Airflow connection. The music is original, and the video includes a neural voiceover.
 
-Regenerate the edited film (Python 3.12, FFmpeg, Debian/Ubuntu fonts and neural TTS connectivity):
-
-```bash
-python -m pip install -r requirements-video.txt
-python scripts/render-story-demo.py
-```
-
-Regenerate the underlying Playwright recording separately using [the capture script](scripts/record-demo.mjs); see [DEMO.md](DEMO.md). The app's native Relate integration and eight tests do not depend on voice or video tooling.
+**Earlier technical material:** [83-second narrated story](demo/data-impact-graph-story.mp4) · [99-second uninterrupted real-app Playwright recording](demo/data-impact-graph-demo.mp4) · [original screenshot](demo/poster.png). These remain available for verification, but the new OpenLineage film is the recommended hackathon demo.
 
 ## AI-assisted development
 

@@ -1,0 +1,105 @@
+{
+  "producer": "official openlineage-python SDK",
+  "pipeline": "real local SQLite SQL transformations, with SQLGlot-derived field lineage",
+  "source_data": "synthetic fictional records",
+  "events": "demo/film-working/instrumented-openlineage.jsonl",
+  "events_count": 10,
+  "jobs": [
+    {
+      "step": "normalize_assay",
+      "target": "stage_assays",
+      "rows": 3,
+      "sql": "SELECT a.lot_id AS lot_id,\n       a.moisture_pct / 100.0 AS moisture_ratio\n     FROM raw_assays AS a",
+      "inputs": [
+        "raw_assays"
+      ],
+      "lineage_columns": [
+        "lot_id",
+        "moisture_ratio"
+      ]
+    },
+    {
+      "step": "calculate_dry_mass",
+      "target": "core_dry_mass",
+      "rows": 3,
+      "sql": "SELECT a.lot_id AS lot_id,\n       h.gross_kg * (1.0 - a.moisture_ratio) AS dry_kg\n     FROM stage_assays AS a JOIN raw_harvests AS h ON a.lot_id = h.lot_id",
+      "inputs": [
+        "stage_assays",
+        "raw_harvests"
+      ],
+      "lineage_columns": [
+        "lot_id",
+        "dry_kg"
+      ]
+    },
+    {
+      "step": "supplier_payouts",
+      "target": "marts_supplier_settlements",
+      "rows": 3,
+      "sql": "SELECT d.lot_id AS lot_id,\n       d.dry_kg * c.price_per_dry_kg AS payout_eur\n     FROM core_dry_mass AS d JOIN raw_contracts AS c ON d.lot_id = c.lot_id",
+      "inputs": [
+        "core_dry_mass",
+        "raw_contracts"
+      ],
+      "lineage_columns": [
+        "lot_id",
+        "payout_eur"
+      ]
+    },
+    {
+      "step": "scope3_intensity",
+      "target": "marts_scope3_intensity",
+      "rows": 3,
+      "sql": "SELECT d.lot_id AS lot_id,\n       f.kg_co2e / (d.dry_kg / 1000.0) AS co2e_per_dry_tonne\n     FROM core_dry_mass AS d JOIN raw_fleet AS f ON d.lot_id = f.lot_id",
+      "inputs": [
+        "core_dry_mass",
+        "raw_fleet"
+      ],
+      "lineage_columns": [
+        "lot_id",
+        "co2e_per_dry_tonne"
+      ]
+    },
+    {
+      "step": "field_yield",
+      "target": "marts_field_yield",
+      "rows": 2,
+      "sql": "SELECT h.field_id AS field_id,\n       SUM(h.gross_kg) AS yield_kg\n     FROM raw_harvests AS h GROUP BY h.field_id",
+      "inputs": [
+        "raw_harvests"
+      ],
+      "lineage_columns": [
+        "field_id",
+        "yield_kg"
+      ]
+    }
+  ],
+  "sample_finance": [
+    [
+      "LOT-001",
+      3360.0
+    ],
+    [
+      "LOT-002",
+      4794.0
+    ],
+    [
+      "LOT-003",
+      2295.0
+    ]
+  ],
+  "sample_climate": [
+    [
+      "LOT-001",
+      150.0
+    ],
+    [
+      "LOT-002",
+      139.22
+    ],
+    [
+      "LOT-003",
+      170.59
+    ]
+  ]
+}

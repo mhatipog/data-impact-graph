@@ -1,0 +1,89 @@
+{
+  "title": "Before the Merge \u2014 Data Impact Graph",
+  "source": "executed SQLite ETL + official OpenLineage SDK + native Relate + real Playwright browser",
+  "source_data": "fictional sample lots; no customer data",
+  "events_generated_by_sdk": 10,
+  "event_sha256": "1ffb090baed3ed2d6e8700a9b727b480bda41088c7aaa6f8168c60d92c2550dd",
+  "replay_idempotent": true,
+  "browser_assertions": "Playwright screenshots of the real local app, live Relate API",
+  "native_paths": {
+    "finance": [
+      "moisture_pct",
+      "moisture_ratio",
+      "dry_kg",
+      "payout_eur"
+    ],
+    "climate": [
+      "moisture_pct",
+      "moisture_ratio",
+      "dry_kg",
+      "co2e_per_dry_tonne"
+    ]
+  },
+  "music": {
+    "bpm": 102,
+    "key": "A minor",
+    "duration_seconds": 105.69127,
+    "source": "original procedural composition; no external samples",
+    "bytes": 18643988
+  },
+  "narration_voice": "en-US-AndrewNeural",
+  "duration_seconds": 105.712993,
+  "fps": 24,
+  "resolution": "1920x1080",
+  "video_bytes": 4552531,
+  "sha256": "b3b63dcd44c8cb2429822785b9b3c1943d682466ac7ee21e0e4ea47d476300b6",
+  "scenes": [
+    {
+      "name": "hook",
+      "duration_seconds": 9.625,
+      "voice": "A developer proposes changing one lab field from a percentage to a fraction. Before merging, there's one question: what else depends on it?"
+    },
+    {
+      "name": "sql",
+      "duration_seconds": 11.917,
+      "voice": "We begin with an actual local SQL pipeline. It executes normalization, dry mass, settlements, and carbon intensity. These aren't invented connections on a diagram."
+    },
+    {
+      "name": "sdk",
+      "duration_seconds": 12.417,
+      "voice": "The official OpenLineage client emits job and column lineage from those executed SQL expressions. These events identify precisely which input fields feed each output."
+    },
+    {
+      "name": "import",
+      "duration_seconds": 10.458,
+      "voice": "One import command turns those events into a persistent embedded Relate graph. No graph server, hosted account, or database credentials."
+    },
+    {
+      "name": "question",
+      "duration_seconds": 9.0,
+      "voice": "Now imagine reviewing that proposed moisture change. Search for the original column and ask Relate for its actual downstream paths."
+    },
+    {
+      "name": "finance",
+      "duration_seconds": 10.167,
+      "voice": "The first branch reaches supplier payouts, through normalized moisture and dry mass. It's an explicit, inspectable path, not an AI guess."
+    },
+    {
+      "name": "climate",
+      "duration_seconds": 9.333,
+      "voice": "The same calculation also reaches carbon intensity. Two business consequences, discovered while the engineer can still change the plan."
+    },
+    {
+      "name": "precision",
+      "duration_seconds": 11.667,
+      "voice": "Try field I D instead. That column leads toward field yield, not these finance or climate outputs. Missing lineage is still unknown, not a safety guarantee."
+    },
+    {
+      "name": "review",
+      "duration_seconds": 10.958,
+      "voice": "And the engineer can export a real Markdown impact receipt, showing downstream fields and every documented reason. Share it with reviewers before the merge."
+    },
+    {
+      "name": "outro",
+      "duration_seconds": 10.125,
+      "voice": "Bring the lineage you already have. Relate makes it locally queryable. Data Impact Graph makes the consequences reviewable, before you change the data."
+    }
+  ],
+  "verification": "source events/graph paths, Playwright, H264/AAC, decoded frames, volume"
+}

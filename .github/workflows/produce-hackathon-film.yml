@@ -1,0 +1,97 @@
+name: Hackathon film — real OpenLineage workflow
+
+on:
+  push:
+    branches: [video/openlineage-real-workflow-v4]
+    paths:
+      - 'scripts/instrumented-pipeline.py'
+      - 'scripts/capture-openlineage-film.mjs'
+      - 'scripts/preview-openlineage-captures.py'
+      - 'scripts/render-openlineage-film.py'
+      - 'scripts/original-story-score.py'
+      - 'requirements-hackathon-video.txt'
+      - '.github/workflows/produce-hackathon-film.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  producer-and-browser:
+    if: "!contains(github.event.head_commit.message, '[skip film]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install actual Relate engine, OpenLineage SDK and SQLGlot
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y ffmpeg fonts-dejavu-core fonts-liberation2
+          python -m pip install -r requirements.txt -r requirements-video.txt -r requirements-hackathon-video.txt
+      - name: Run actual SQL ETL and emit official SDK OpenLineage events
+        run: |
+          python scripts/instrumented-pipeline.py --out demo/film-working
+          python -m data_impact_graph import openlineage demo/film-working/instrumented-openlineage.jsonl --store demo/film-working/imported.rl | tee demo/film-working/import-log.json
+          python -m data_impact_graph import openlineage demo/film-working/instrumented-openlineage.jsonl --store demo/film-working/imported.rl | tee demo/film-working/replay-log.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from data_impact_graph.openlineage import _ident
+          from data_impact_graph.core import impact
+          repo=Path('demo/film-working')
+          assert json.loads((repo/'replay-log.json').read_text())['unchanged']
+          ns='sqlite://data-impact-graph/instrumented-local-etl'
+          src=_ident('col',ns,'raw_assays','moisture_pct')
+          affected={a['id'] for a in impact(src,store_path=repo/'imported.rl')['affected']}
+          for table,field in [('marts_supplier_settlements','payout_eur'),
+                              ('marts_scope3_intensity','co2e_per_dry_tonne')]:
+              assert _ident('col',ns,table,field) in affected, (table,field)
+          fld=_ident('col',ns,'raw_harvests','field_id')
+          negative={a['id'] for a in impact(fld,store_path=repo/'imported.rl')['affected']}
+          assert not affected.intersection(negative & {
+              _ident('col',ns,'marts_supplier_settlements','payout_eur'),
+              _ident('col',ns,'marts_scope3_intensity','co2e_per_dry_tonne')})
+          print('SDK_TO_RELATE_IMPACT_VERIFIED')
+          PY
+      - name: Install Playwright Chromium browser
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Capture real browser states and exported receipt
+        run: |
+          python -m data_impact_graph serve --store demo/film-working/imported.rl --port 8765 >/tmp/data-impact-graph-film-server.log 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          python - <<'PY'
+          import time,urllib.request
+          for i in range(60):
+              try:
+                  with urllib.request.urlopen('http://127.0.0.1:8765/api/health',timeout=2) as r:
+                      if r.status==200:break
+              except OSError:time.sleep(.2)
+          else:raise RuntimeError('Local Relate server did not start')
+          PY
+          node scripts/capture-openlineage-film.mjs demo/film-working
+          python scripts/preview-openlineage-captures.py
+      - name: Edit final 1080p film with neural voice and original soundtrack
+        run: |
+          python scripts/render-openlineage-film.py --work demo/film-working
+          test -s demo/data-impact-graph-openlineage-film.mp4
+          test -s demo/openlineage-film-contact-sheet.png
+          test -s demo/openlineage-film-manifest.json
+          ffprobe -v error -show_entries stream=codec_name,codec_type -of compact demo/data-impact-graph-openlineage-film.mp4
+      - name: Publish final video and evidence without Actions artifacts
+        run: |
+          cp demo/film-working/instrumented-openlineage.jsonl examples/openlineage-sdk-emitted.jsonl
+          cp demo/film-working/instrumented-run.json demo/openlineage-sdk-run-proof.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add examples/openlineage-sdk-emitted.jsonl demo/openlineage-sdk-run-proof.json demo/openlineage-browser-contact-sheet.png demo/data-impact-graph-openlineage-film.mp4 demo/openlineage-film-contact-sheet.png demo/openlineage-film-manifest.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "demo: publish final OpenLineage journey film and source evidence [skip film]"
+          git push origin HEAD:refs/heads/video/openlineage-real-workflow-v4

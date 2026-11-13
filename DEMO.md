@@ -1,6 +1,12 @@
-# Data Impact Graph — recorded demos
+# Data Impact Graph — demo films and evidence
 
-**Primary hackathon film:** [83-second narrated story cut](demo/data-impact-graph-story.mp4) · [Frame review](demo/story-contact-sheet.png) · [Manifest](demo/story-manifest.json). Original electronic soundtrack, neural voiceover, distinct editorial scenes, and focused cuts from the live Relate recording. Produced by [story editor](scripts/render-story-demo.py) and [original score generator](scripts/original-story-score.py).
+**Primary hackathon film:** [1:46 Before the Merge — OpenLineage → Relate → impact review](demo/data-impact-graph-openlineage-film.mp4) · [10-scene frame review](demo/openlineage-film-contact-sheet.png) · [captions](demo/data-impact-graph-openlineage-film.srt) · [render manifest](demo/openlineage-film-manifest.json).
+
+This is an edited mini-film from **real executed SQL**, OpenLineage events emitted by the **official SDK**, a **native embedded Relate graph**, **real Playwright screenshots** and the **actual exported Markdown impact receipt**. Original procedural music and English neural narration accompany the story. Fictional sample lots are used; no corporate platform is claimed.
+
+Read [FILM.md](FILM.md) to reproduce all events, UI captures and the final video. The [executed producer proof](demo/openlineage-sdk-run-proof.json) and [SDK-generated event file](examples/openlineage-sdk-emitted.jsonl) support the technical claims.
+
+**Previous 83-second story cut:** [MP4](demo/data-impact-graph-story.mp4) · [preview](demo/story-contact-sheet.png) · [manifest](demo/story-manifest.json). Retained for comparison; it predates OpenLineage ingestion.
 
 ## Original continuous technical capture and storyboard
 

@@ -124,12 +124,12 @@ def mark(img,words,x,y,angle=-6,fill=YELLOW,scale=1.0):
     layer=layer.rotate(angle,expand=True,resample=Image.Resampling.BICUBIC)
     img.paste(layer,(int(x),int(y)),layer)
 
-def actual_screenshot(img,source,xywh,zoom_at=0.0,focus=(.5,.5),border=TEAL):
+def actual_screenshot(img,source,xywh,zoom_at=0.0,focus=(.5,.5),border=TEAL,zoom_factor=1.0):
     """Crop only genuine Playwright pixels; never recreate or synthesize the UI."""
     x,y,w,h=map(int,xywh)
     sw,sh=source.size
     # Show the whole element where possible. Dynamic 3.5% camera push.
-    ratio=max(w/sw,h/sh)*(1+0.035*ease(zoom_at))
+    ratio=max(w/sw,h/sh)*zoom_factor*(1+0.035*ease(zoom_at))
     nw=max(w,round(sw*ratio));nh=max(h,round(sh*ratio))
     frame=source.resize((nw,nh),Image.Resampling.LANCZOS)
     ox=min(max(0,round((nw-w)*focus[0])),nw-w)
@@ -251,7 +251,7 @@ def scene(img,part,seconds,ev):
         t(d,78,50,"04  /  IN THE ACTUAL APP", "mono",24,TEAL)
         t(d,83,126,"Before changing the field,", "display",71,WHITE)
         t(d,81,208,"ask what depends on it.", "italic",73,COPPER)
-        actual_screenshot(img,s["overview-map"],(73,347,1192,447),seconds/2.7,focus=(.42,.48))
+        actual_screenshot(img,s["overview-map"],(73,347,1192,447),seconds/2.7,focus=(.52,.55),zoom_factor=1.72)
         d=ImageDraw.Draw(img)
         t(d,1301,406,"Search:", "mono",25,MIST)
         t(d,1283,462,"moisture", "display",52,WHITE)
@@ -304,23 +304,22 @@ def scene(img,part,seconds,ev):
         t(d,78,52,"08  /  PRE-MERGE REVIEW", "mono",23,TEAL)
         t(d,76,146,"The graph becomes", "display",97,WHITE)
         t(d,82,270,"a review receipt.", "italic",94,COPPER)
-        d.rounded_rectangle((77,429,1114,829),radius=13,fill=PAPER)
-        d.rounded_rectangle((108,458,1079,804),radius=7,outline=(208,192,171),width=2)
-        excerpt=[]
-        for line in ev["receipt"].splitlines():
-            if line.startswith("# Data impact review") or line.startswith("- Asset:") or line.startswith("- Connected assets") or line.startswith("## Downstream datasets") or line.startswith("### payout_eur") or line.startswith("### co2e_per_dry_tonne"):
-                excerpt.append(line.replace("#","").strip())
-        assert len(excerpt)>=4
-        t(d,129,480,"EXPORTED FROM REAL APPLICATION", "mono",22,(139,95,71))
-        yy=545
-        for line in excerpt[:6]:
-            t(d,132,yy,line[:64],"mono",23,INK)
-            yy+=48
-        t(d,1187,489,"Copy into", "italic",45,TEAL)
-        t(d,1172,553,"the PR.", "display",67,WHITE)
-        scribble(d,1180,655,255,COPPER,(seconds-.6)/1.8,7)
-        t(d,1172,722,"Every route", "sans",28,MIST)
-        t(d,1172,764,"has a reason.", "sans",28,MIST)
+        d.rounded_rectangle((77,429,1181,829),radius=13,fill=PAPER)
+        d.rounded_rectangle((106,456,1153,804),radius=7,outline=(208,192,171),width=2)
+        t(d,128,482,"IMPACT RECEIPT   /   moisture_pct", "strong",34,INK)
+        d.line((129,542,1118,542),fill=COPPER,width=4)
+        t(d,131,560,"PROPOSED CHANGE   percent 0-100  ->  fraction 0-1", "mono",21,(110,91,77))
+        d.ellipse((135,625,157,647),fill=COPPER)
+        t(d,169,611,"Supplier settlement  /  "+ev["finance"][-1], "mono",29,INK)
+        t(d,171,657,str(len(ev["finance"])-1)+" documented dependencies", "mono",21,(111,115,112))
+        d.ellipse((135,723,157,745),fill=TEAL)
+        t(d,169,709,"Carbon intensity  /  "+ev["climate"][-1], "mono",27,INK)
+        t(d,171,761,str(len(ev["climate"])-1)+" documented dependencies", "mono",21,(111,115,112))
+        t(d,1224,492,"Copy into", "italic",45,TEAL)
+        t(d,1213,551,"the PR.", "display",67,WHITE)
+        scribble(d,1218,655,271,COPPER,(seconds-.6)/1.8,7)
+        t(d,1219,715,"Exact paths", "sans",30,MIST)
+        t(d,1219,761,"and reasons.", "sans",30,MIST)
     elif k=="outro":
         t(d,80,69,"DATA IMPACT GRAPH  /  OPEN SOURCE", "mono",23,TEAL)
         t(d,80,184,"Your lineage.", "display",122,WHITE)

@@ -217,8 +217,13 @@ def show_negative(im,t,snaps):
         for y in (347,462):
             d.line((1019,y,1085,y+80),fill=RED,width=9)
             d.line((1085,y,1019,y+80),fill=RED,width=9)
-    paste_screen(im,snaps["negative"],(350,535,1560,815),(84,607,936,216),t,.025)
-    d=ImageDraw.Draw(im)
+    # The original scroll recording has empty graph space at this point.
+    # Use evidence from the independently checked negative control instead
+    # of inserting a meaningless, unreadable UI crop.
+    d.rounded_rectangle((84,608,1014,824),radius=9,fill=(19,38,54),outline=(51,91,99),width=2)
+    paint(d,(119,636),"NEGATIVE CONTROL / REAL RELATE QUERY",font("mono",23),TEAL)
+    paint(d,(119,695),"field_id  ->  yield reporting",font("mono",31),WHITE)
+    paint(d,(119,761),"No path to payout or Scope 3.",font("mono",26),ORANGE)
     paint(d,(1056,663),"No unrelated",font("serif",43),WHITE)
     paint(d,(1056,715),"false positives.",font("serif",43),WHITE)
 def show_receipt(im,t,receipt_text):

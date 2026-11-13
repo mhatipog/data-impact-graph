@@ -37,7 +37,9 @@ cd data-impact-graph
 ./run.sh
 ```
 
-Open **http://127.0.0.1:8765**. The default selection traces `lab.assays.moisture_pct` downstream. Click a metric to see the chain; click a node to pivot; search for any asset; toggle upstream/downstream or view all assets. The frontend uses native SVG and no CDN.
+Open **http://127.0.0.1:8765**. The default selection traces `lab.assays.moisture_pct` all the way to the less-obvious **Scope 3 assurance** dashboard. The graph begins with a readable, two-row **shortest verified route**; click another business output to change the route. Switch to **Impact map** for all reachable assets or **All assets** for the full catalog. Click a node to pivot, search by column name, or toggle upstream/downstream. The frontend uses native SVG and no CDN.
+
+For a useful precision contrast, choose **A narrower field change** in the sidebar: changing `field_id` affects the field-yield calculation but not payout or carbon intensity. Those unaffected outputs are excluded because the graph records column-specific read dependencies; these are not heuristic guesses.
 
 Useful first query, without the web interface:
 
@@ -45,7 +47,23 @@ Useful first query, without the web interface:
 . .venv/bin/activate
 python -m data_impact_graph impact lab.assays.moisture_pct
 python -m data_impact_graph impact metric.carbon --upstream
+
+# Markdown change-review receipt for a pull request or change advisory
+python -m data_impact_graph report lab.assays.moisture_pct \
+  --change "percent 0-100 to ratio 0-1" > impact-review.md
 ```
+
+You can also enter the proposed change in the interface and click **Download impact receipt**. It lists affected business outputs with the exact traced IDs and each `why` explanation. The optional change description is recorded as a user-supplied note; it does not alter traversal or claim the change will cause failures. The read-only API endpoint is `GET /api/report?id=lab.assays.moisture_pct&change=percent-to-ratio`.
+
+### Connect a coding agent directly to Relate (optional)
+
+The repository includes a project-scoped [`.mcp.json`](.mcp.json) with the **native Relate MCP server**, not a custom or simulated agent integration. Install the official [Relate CLI](https://relatedb.ai/docs/get-started/install/) and open this project in an MCP-capable IDE (for example Claude Code, which requests approval for project MCP configurations). The config invokes:
+
+```bash
+relate serve --mcp stdio --database ./data/sample.rl --read-only
+```
+
+This exposes Relate's `get_schema` and `read_cypher` tools directly to your coding agent. Ask: **"Before changing LabTrack moisture_pct from percent to fraction, trace every downstream metric and dashboard in Relate, show why the Scope 3 dashboard is involved, and flag which sibling columns are *not* affected."** The optional `AGENTS.md` documents the semantics and a safe review protocol. The Python application and one-command setup do **not** require installing the CLI or any agent.
 
 Run the integration tests:
 
@@ -82,7 +100,11 @@ relate --database ./data/sample.rl --read-only \
 
 ## Demo
 
-See [`DEMO.md`](DEMO.md) for a 90-second screen-recording script.
+See [`DEMO.md`](DEMO.md) for a 90-second screen-recording script and [`SUBMISSION.md`](SUBMISSION.md) for a draft Devpost description and recording checklist. The attached Relate snapshot was created and verified on an Oracle Cloud ARM64 self-hosted runner, with 8 native integration tests (including receipt evidence and negative-control semantics). A static mock is **not** used at runtime.
+
+## AI-assisted development
+
+ChatGPT assisted with code, synthetic metadata, tests and documentation. The production app does **not** call an LLM, an AI API or a remote graph service; dependency answers come from native Relate Cypher. All examples are fictional and any agent-facing MCP configuration is optional.
 
 ## License
 

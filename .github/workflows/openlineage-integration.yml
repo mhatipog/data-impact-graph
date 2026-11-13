@@ -1,0 +1,100 @@
+name: OpenLineage / native Relate integration
+
+on:
+  push:
+    branches: [feat/openlineage-ingestion]
+    paths:
+      - 'data_impact_graph/**'
+      - 'tests/**'
+      - 'examples/openlineage-events.jsonl'
+      - '.github/workflows/openlineage-integration.yml'
+      - 'static/**'
+  pull_request:
+    paths:
+      - 'data_impact_graph/**'
+      - 'tests/**'
+      - 'examples/openlineage-events.jsonl'
+      - 'static/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-relate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install native embedded Relate wheel
+        run: python -m pip install -r requirements.txt
+      - name: Validate Python and JavaScript syntax
+        run: |
+          python -m compileall -q data_impact_graph tests
+          node --check static/app.js
+      - name: Run native Relate integration suites
+        run: python -m unittest discover -s tests -v
+      - name: Import real-format OpenLineage JSONL and exercise CLI
+        run: |
+          python -m data_impact_graph import openlineage examples/openlineage-events.jsonl --store /tmp/impact-openlineage.rl
+          python -m data_impact_graph import-openlineage examples/openlineage-events.jsonl --store /tmp/impact-openlineage.rl
+          python -m data_impact_graph overview --store /tmp/impact-openlineage.rl > /tmp/openlineage-overview.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          meta=json.loads(Path('/tmp/openlineage-overview.json').read_text())
+          assert meta['source']=='openlineage'
+          assert len(meta['assets']) >= 15
+          assert len(meta['flows']) >= 15
+          assert any('provenance' in e for e in meta['flows'])
+          from data_impact_graph.core import impact, receipt
+          from data_impact_graph.openlineage import _ident
+          store=Path('/tmp/impact-openlineage.rl')
+          ns='postgresql://demo-warehouse'
+          source=_ident('col',ns,'raw.lot_assays','moisture_pct')
+          ids={x['id'] for x in impact(source, store_path=store)['affected']}
+          for target in ('marts.scope3_intensity','marts.supplier_settlements'):
+              assert any(x.startswith('ol:col:') and x in ids for x in [
+                  _ident('col',ns,target,
+                         'co2e_per_dry_tonne' if 'scope3' in target else 'payout_eur')
+              ]), target
+          assert _ident('col',ns,'marts.field_yield','yield_kg') not in ids
+          assert 'OpenLineage' in receipt(source,store_path=store)
+          print('NATIVE_OPENLINEAGE_SMOKE_OK')
+          PY
+      - name: Verify imported graph through the live local API
+        run: |
+          python -m data_impact_graph serve --store /tmp/impact-openlineage.rl --port 8876 >/tmp/dig-server.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          python - <<'PY'
+          import json
+          import time
+          from urllib.error import URLError
+          from urllib.parse import urlencode
+          from urllib.request import urlopen
+          from data_impact_graph.openlineage import _ident
+          base="http://127.0.0.1:8876"
+          def fetch(path):
+              for attempt in range(20):
+                  try:
+                      with urlopen(base+path, timeout=4) as response:
+                          assert response.status==200
+                          return response.read().decode()
+                  except URLError:
+                      if attempt==19: raise
+                      time.sleep(.15)
+          graph=json.loads(fetch("/api/graph"))
+          assert graph["source"]=="openlineage"
+          assert graph["store"]=="/tmp/impact-openlineage.rl"
+          identity=_ident("col","postgresql://demo-warehouse","raw.lot_assays","moisture_pct")
+          impact=json.loads(fetch("/api/impact?"+urlencode({"id":identity})))
+          assert impact["affected_count"]>=3
+          receipt=fetch("/api/report?"+urlencode({"id":identity,"change":"percent to ratio"}))
+          assert "Downstream datasets and fields" in receipt
+          assert "percent to ratio" in receipt
+          print("OPENLINEAGE_LOCAL_API_OK")
+          PY

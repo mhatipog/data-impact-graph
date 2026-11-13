@@ -2,7 +2,7 @@
 
 **Before changing a source field, see which business outcomes depend on it—and the exact graph path explaining why.**
 
-A local, dependency-aware lineage explorer for data engineers, built for the [Relate by Neo4j Hackathon](https://relate.devpost.com/). No API keys, graph server, LLM, frontend build or paid services. All data is fictional.
+A local, dependency-aware lineage explorer for data engineers, built for the [Relate by Neo4j Hackathon](https://relate.devpost.com/). No API keys, graph server, LLM, frontend build or paid services. The bundled example is fictional; you can also import lineage from your own OpenLineage events.
 
 ## Use case
 
@@ -26,6 +26,20 @@ RETURN p ORDER BY length(p) ASC LIMIT 600
 ```
 
 The reverse traversal uses `<-[:FLOWS_TO*1..12]-`. The JSON API includes the returned path nodes and each relationship's explanation, not fabricated links. See [Relate Python API](https://relatedb.ai/docs/reference/api/python/) and [Relate repo](https://github.com/relatedb/relate).
+
+## Use real lineage from OpenLineage
+
+**Your existing instrumentation is the source of truth.** Import standard OpenLineage JSON or JSONL events from Spark, Airflow, dbt, or another producer into a separate embedded Relate graph, then explore real dataset and field dependencies without running a metadata server.
+
+```bash
+python -m data_impact_graph import openlineage examples/openlineage-events.jsonl \
+  --store data/openlineage.rl
+python -m data_impact_graph serve --store data/openlineage.rl
+```
+
+The importer recognizes explicit Column Lineage, newer Job Lineage and Dataset Lineage facets. It retains schema inventory but **does not invent** input-to-output relationships from bare job boundaries, and it incrementally replaces older known mappings on later successful runs. Repeat an import safely: unchanged events are idempotent. The included events are synthetic and intended to test the OpenLineage-compatible workflow; point it at your own producer exports for real lineage.
+
+Read [**OpenLineage ingestion, producer setup, limitations and provenance**](OPENLINEAGE.md). No live OpenLineage HTTP receiver or automatic Fabric/Power BI catalog connector is included yet.
 
 ## Setup and run
 
@@ -108,10 +122,10 @@ The main film is a deliberately edited product story: a lab field changes units,
 
 Regenerate the edited film (Python 3.12, FFmpeg, Debian/Ubuntu fonts and neural TTS connectivity):
 
-\`\`\`bash
+```bash
 python -m pip install -r requirements-video.txt
 python scripts/render-story-demo.py
-\`\`\`
+```
 
 Regenerate the underlying Playwright recording separately using [the capture script](scripts/record-demo.mjs); see [DEMO.md](DEMO.md). The app's native Relate integration and eight tests do not depend on voice or video tooling.
 

@@ -117,12 +117,17 @@ class _Graph:
             self.asset("DATASET", namespace, name, _required(_mapping(field, "schema.field").get("name"), "schema.field.name"))
         return self.snapshot()
 
-    def reference(self, source, default_type="DATASET"):
+    def reference(self, source, default_type="DATASET", current_job=None):
         source = _mapping(source, "lineage input")
         kind = source.get("type", default_type)
         if kind not in ("JOB", "DATASET"):
             raise ValueError("Unsupported lineage input type")
-        namespace, name = _identity(source, "lineage input")
+        if kind == "JOB" and not source.get("namespace") and not source.get("name"):
+            if current_job is None:
+                raise ValueError("An implicit job input requires an enclosing job")
+            namespace, name = current_job
+        else:
+            namespace, name = _identity(source, "lineage input")
         field = source.get("field")
         if field is not None and kind != "DATASET":
             raise ValueError("Job fields are not supported")
@@ -141,12 +146,12 @@ class _Graph:
                 descriptions.append(text.replace("\n", " ")[:200])
         return (label + (": " + "; ".join(descriptions) if descriptions else ""))[:1000]
 
-    def exact_lineage(self, target, inputs, fields, origin):
+    def exact_lineage(self, target, inputs, fields, origin, current_job=None):
         target_id, ns, name, field = self.reference(target)
         if field is not None:
             raise ValueError("Lineage target must be a dataset or job, not a field")
         for item in _sequence(inputs, "lineage.inputs"):
-            source_id, _, _, _ = self.reference(item)
+            source_id, _, _, _ = self.reference(item, current_job=current_job)
             self.flow(source_id, target_id, self._reason(item, "Explicit dataset lineage"),
                       "derive", origin)
         for out_name, spec in _mapping(fields, "lineage.fields").items():
@@ -154,7 +159,7 @@ class _Graph:
                 raise ValueError("Field-level lineage requires a dataset target")
             output_id = self.asset("DATASET", ns, name, _required(out_name, "output field"))
             for item in _sequence(_mapping(spec, "lineage field").get("inputs", []), "lineage.fields.inputs"):
-                source_id, _, _, _ = self.reference(item)
+                source_id, _, _, _ = self.reference(item, current_job=current_job)
                 self.flow(source_id, output_id, self._reason(item, "Explicit field lineage"),
                           "derive", origin)
 
@@ -238,6 +243,11 @@ def _normalize(event, state):
         inputs, outputs = [], [dataset]
     else:
         raise ValueError("OpenLineage event must be RunEvent, JobEvent or DatasetEvent")
+    producer = event.get("producer", "unknown producer")
+    if not isinstance(producer, str):
+        raise ValueError("producer must be a string")
+    origin = (origin + " | producer " + producer + " | observed " +
+              _required(event["eventTime"], "eventTime"))[:1000]
     digest = _fingerprint(event)
     changed = 0
     # Record inventory without claiming any input-to-output flow. In
@@ -277,7 +287,8 @@ def _normalize(event, state):
                 if type_name == "JOB" and not target["namespace"] and not target["name"]:
                     target = {"type": "JOB", "namespace": namespace, "name": name}
                 graph = _Graph()
-                graph.exact_lineage(target, entry.get("inputs", []), entry.get("fields", {}), origin + " (lineage facet)")
+                graph.exact_lineage(target, entry.get("inputs", []), entry.get("fields", {}),
+                                    origin + " (lineage facet)", current_job=(namespace, name))
                 target_id, _, _, _ = graph.reference(target)
                 changed += int(_record(state, "flow:%s:%s" % (job_id, target_id),
                                        timestamp, graph, digest))

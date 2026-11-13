@@ -31,7 +31,27 @@ async function load(){try{
   if(!state.selected)throw new Error('No imported assets: load a valid OpenLineage event first.');
   await selectAsset(state.selected);
 }catch(e){showError(e);}}
-async function selectAsset(id){state.selected=id;state.chosenOutput=null;try{state.impact=await fetchJson(`/api/impact?id=${encodeURIComponent(id)}&direction=${state.direction}`);updateResults();renderGraph();}catch(e){showError(e);}}
+async function selectAsset(id){state.selected=id;state.chosenOutput=null;try{
+ state.impact=await fetchJson(`/api/impact?id=${encodeURIComponent(id)}&direction=${state.direction}`);
+ // A large overview is bounded. Native Relate traversals may include nodes
+ // outside that preview; merge their ACTUAL path evidence before rendering.
+ const assets=new Map(state.graph.assets.map(a=>[a.id,a]));
+ assets.set(state.impact.source.id,state.impact.source);
+ const edges=new Map(state.graph.flows.map(e=>[`${e.source}::${e.target}`,e]));
+ for(const asset of state.impact.affected){
+   assets.set(asset.id,asset);
+   for(const path of asset.paths||[]){
+     path.ids.slice(1).forEach((target,i)=>{
+       const source=path.ids[i],e=path.edges[i]||{};
+       const key=`${source}::${target}`;
+       if(!edges.has(key))edges.set(key,{source,target,why:e.why||'',mode:e.mode||'',provenance:e.provenance||''});
+     });
+   }
+ }
+ state.graph.assets=Array.from(assets.values());
+ state.graph.flows=Array.from(edges.values());
+ updateResults();renderGraph();
+}catch(e){showError(e);}}
 function updateResults(){const d=state.impact;$('#focus-title').textContent=d.source.name;$('#focus-subtitle').textContent=`${d.source.kind} · ${d.source.system} · ${d.source.id}`;$('#affected').textContent=d.affected_count;$('#business-outputs').textContent=state.graph.source==='openlineage'
  ?d.affected.filter(a=>a.kind==='Table'||a.kind==='Column').length:d.output_count;$('#system-count').textContent=d.systems.length;$('#result-count').textContent=d.affected_count;
 if(state.graph.source==='openlineage'){

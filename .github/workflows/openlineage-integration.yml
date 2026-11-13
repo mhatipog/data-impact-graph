@@ -65,3 +65,36 @@ jobs:
           assert 'OpenLineage' in receipt(source,store_path=store)
           print('NATIVE_OPENLINEAGE_SMOKE_OK')
           PY
+      - name: Verify imported graph through the live local API
+        run: |
+          python -m data_impact_graph serve --store /tmp/impact-openlineage.rl --port 8876 >/tmp/dig-server.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          python - <<'PY'
+          import json
+          import time
+          from urllib.error import URLError
+          from urllib.parse import urlencode
+          from urllib.request import urlopen
+          from data_impact_graph.openlineage import _ident
+          base="http://127.0.0.1:8876"
+          def fetch(path):
+              for attempt in range(20):
+                  try:
+                      with urlopen(base+path, timeout=4) as response:
+                          assert response.status==200
+                          return response.read().decode()
+                  except URLError:
+                      if attempt==19: raise
+                      time.sleep(.15)
+          graph=json.loads(fetch("/api/graph"))
+          assert graph["source"]=="openlineage"
+          assert graph["store"]=="/tmp/impact-openlineage.rl"
+          identity=_ident("col","postgresql://demo-warehouse","raw.lot_assays","moisture_pct")
+          impact=json.loads(fetch("/api/impact?"+urlencode({"id":identity})))
+          assert impact["affected_count"]>=3
+          receipt=fetch("/api/report?"+urlencode({"id":identity,"change":"percent to ratio"}))
+          assert "Downstream datasets and fields" in receipt
+          assert "percent to ratio" in receipt
+          print("OPENLINEAGE_LOCAL_API_OK")
+          PY

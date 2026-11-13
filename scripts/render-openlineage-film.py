@@ -251,7 +251,7 @@ def scene(img,part,seconds,ev):
         t(d,78,50,"04  /  IN THE ACTUAL APP", "mono",24,TEAL)
         t(d,83,126,"Before changing the field,", "display",71,WHITE)
         t(d,81,208,"ask what depends on it.", "italic",73,COPPER)
-        actual_screenshot(img,s["overview-map"],(73,347,1192,447),seconds/2.7,focus=(.52,.55),zoom_factor=1.72)
+        actual_screenshot(img,s["overview-map"],(73,347,1192,447),seconds/2.7,focus=(.13,.55),zoom_factor=1.72)
         d=ImageDraw.Draw(img)
         t(d,1301,406,"Search:", "mono",25,MIST)
         t(d,1283,462,"moisture", "display",52,WHITE)

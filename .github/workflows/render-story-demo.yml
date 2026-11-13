@@ -1,0 +1,52 @@
+name: Story-first Relate film
+
+on:
+  push:
+    branches:
+      - video/story-first-v3
+    paths:
+      - scripts/render-story-demo.py
+      - scripts/original-story-score.py
+      - requirements-video.txt
+      - .github/workflows/render-story-demo.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  produce:
+    if: "!contains(github.event.head_commit.message, '[skip story]')"
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-video.txt
+      - name: Install reproducible editing environment
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y ffmpeg fonts-dejavu-core fonts-liberation2
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-video.txt
+      - name: Render 1080p story edit, original score, and neural voiceover
+        run: python scripts/render-story-demo.py
+      - name: Validate media stream and chapter previews
+        run: |
+          test -s demo/data-impact-graph-story.mp4
+          test -s demo/story-contact-sheet.png
+          test -s demo/story-manifest.json
+          ffprobe -v error -show_entries stream=codec_type,codec_name -of compact demo/data-impact-graph-story.mp4
+      - name: Publish the verified video without Actions artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add demo/data-impact-graph-story.mp4 demo/story-manifest.json demo/story-contact-sheet.png
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "demo: publish story-first film with original score [skip story]"
+          git push origin HEAD:refs/heads/video/story-first-v3

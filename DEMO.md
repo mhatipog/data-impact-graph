@@ -1,4 +1,8 @@
-# Data Impact Graph — 99-second recorded demo and storyboard
+# Data Impact Graph — recorded demos
+
+**Primary hackathon film:** [83-second narrated story cut](demo/data-impact-graph-story.mp4) · [Frame review](demo/story-contact-sheet.png) · [Manifest](demo/story-manifest.json). Original electronic soundtrack, neural voiceover, distinct editorial scenes, and focused cuts from the live Relate recording. Produced by [story editor](scripts/render-story-demo.py) and [original score generator](scripts/original-story-score.py).
+
+## Original continuous technical capture and storyboard
 
 **Recorded MP4:** [demo/data-impact-graph-demo.mp4](demo/data-impact-graph-demo.mp4) · [Capture manifest](demo/manifest.json) · [Automated Playwright source](scripts/record-demo.mjs).
 

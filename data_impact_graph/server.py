@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from .core import ROOT, impact, overview
+from .core import ROOT, impact, overview, receipt
 
 STATIC = ROOT / "static"
 MIMES = {"/": "text/html; charset=utf-8", "/app.js": "text/javascript; charset=utf-8", "/style.css": "text/css; charset=utf-8"}
@@ -34,8 +34,16 @@ def serve(store: Path, port: int) -> None:
                         result = overview(store)
                     elif target.path == "/api/impact":
                         result = impact(query.get("id", ["lab.assays.moisture_pct"])[0], query.get("direction", ["downstream"])[0], store)
+                    elif target.path == "/api/report":
+                        body = receipt(query.get("id", ["lab.assays.moisture_pct"])[0],
+                                       query.get("direction", ["downstream"])[0],
+                                       store, query.get("change", [""])[0])
+                        return self.send(200, body.encode("utf-8"), "text/markdown; charset=utf-8")
                     elif target.path == "/api/health":
-                        result = {"ok": True, "store": str(store), "engine": "Relate (native embedded Python)"}
+                        # A healthy service must be able to read the actual persistent graph.
+                        result = {"ok": True, "store": str(store),
+                                  "engine": "Relate (native embedded Python)",
+                                  "assets": len(overview(store)["assets"])}
                     else:
                         return self.send(404, b'{"error":"Not found"}', "application/json")
                     return self.send(200, json.dumps(result).encode(), "application/json; charset=utf-8")

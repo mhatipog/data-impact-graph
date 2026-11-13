@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "relate-impact-graph": {
+      "command": "relate",
+      "args": [
+        "serve",
+        "--mcp",
+        "stdio",
+        "--database",
+        "./data/sample.rl",
+        "--read-only"
+      ]
+    }
+  }
+}

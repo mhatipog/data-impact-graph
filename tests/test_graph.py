@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from data_impact_graph.core import SAMPLE, impact, overview, seed, validate
+from data_impact_graph.core import SAMPLE, impact, overview, receipt, seed, validate
 
 
 class GraphTests(unittest.TestCase):
@@ -52,6 +52,26 @@ class GraphTests(unittest.TestCase):
     def test_unknown_asset_is_explicit(self):
         with self.assertRaises(KeyError):
             impact("no.such.asset", store_path=self.store)
+
+    def test_review_receipt_uses_real_edge_reasons(self):
+        text = receipt("lab.assays.moisture_pct", store_path=self.store,
+                       change="percentage to fraction")
+        self.assertIn("Supplier payout forecast", text)
+        self.assertIn("CO2e per dry tonne", text)
+        self.assertIn("Scope 3 assurance", text)
+        self.assertIn("Normalized moisture ratio changes dry mass", text)
+        self.assertIn("percentage to fraction", text)
+        self.assertNotIn("Harvest tonnes per hectare", text)
+        self.assertIn("Potential impact, not a prediction of failure", text)
+
+    def test_upstream_receipt_and_empty_output(self):
+        reverse = receipt("metric.carbon", "upstream", self.store)
+        self.assertIn(" ← ", reverse)
+        self.assertIn("lab.assays.moisture_pct", reverse)
+        empty = receipt("dash.field", store_path=self.store)
+        self.assertIn("No connected business outputs were found", empty)
+        with self.assertRaisesRegex(ValueError, "too long"):
+            receipt("metric.carbon", store_path=self.store, change="x" * 241)
 
     def test_import_rejects_cycles(self):
         metadata = json.loads(SAMPLE.read_text())

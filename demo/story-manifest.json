@@ -22,8 +22,8 @@
   "fps": 24,
   "includes_intro": true,
   "includes_outro": true,
-  "video_bytes": 3847468,
-  "sha256": "c439cc98e9b524cb4c3673b65fcfe418ecf8efc3119e39a747a61e573745b48f",
+  "video_bytes": 3825992,
+  "sha256": "52e22f11c7d4262fc8f30c50ac62e03007ed4cc6d103a3f9b520f32c940ca3bd",
   "scenes": [
     {
       "name": "intro",

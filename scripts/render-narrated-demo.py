@@ -210,6 +210,18 @@ async def main():
         for time in [1,real_length/2,real_length-2]:
             cmd("ffmpeg","-hide_banner","-loglevel","error","-ss",str(time),"-i",str(OUTPUT),
                 "-frames:v","1","-f","null","-")
+        # A contact sheet lets reviewers assess text size and focal points at a glance.
+        contact=Image.new("RGB",(1200,1352),(8,16,28))
+        cursor=0.0
+        for i,chapter in enumerate(scenes):
+            stamp=work/f"review-{i:02d}.png"
+            midpoint=cursor+chapter["duration"]/2
+            cmd("ffmpeg","-hide_banner","-loglevel","error","-y","-ss",str(midpoint),
+                "-i",str(OUTPUT),"-frames:v","1",str(stamp))
+            pic=Image.open(stamp).convert("RGB").resize((600,338),Image.Resampling.LANCZOS)
+            contact.paste(pic,((i%2)*600,(i//2)*338))
+            cursor+=chapter["duration"]
+        contact.save(ROOT/"demo"/"narrated-contact-sheet.png",optimize=True)
         sha=hashlib.sha256(OUTPUT.read_bytes()).hexdigest()
         out={"source":"committed Playwright capture of real Relate application",
              "video_seconds":real_length,"resolution":"1920x1080","framerate":FPS,

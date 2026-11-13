@@ -134,3 +134,61 @@ def impact(asset_id: str, direction: str = "downstream", store_path: Path = STOR
             "affected_count": len(items), "output_count": len(outputs),
             "systems": sorted({a["system"] for a in items if a["system"]}),
             "truncated": len(result) >= MAX_PATHS, "query": query}
+
+def receipt(asset_id: str, direction: str = "downstream", store_path: Path = STORE,
+            change: str = "") -> str:
+    """A reviewer-ready Markdown explanation from native Relate paths, not inferred text."""
+    if len(change) > 240:
+        raise ValueError("change description too long")
+    evidence = impact(asset_id, direction, store_path)
+    source = evidence["source"]
+    change = " ".join(change.split())
+    arrow = " → " if direction == "downstream" else " ← "
+    lines = [
+        f"# Data impact review: {source['name']}", "",
+        f"- Asset: `{source['id']}` ({source['kind']}, {source['system']})",
+        f"- Direction: {direction}",
+        f"- Connected assets requiring review: {evidence['affected_count']}",
+        f"- Business outputs requiring review: {evidence['output_count']}",
+        f"- Impacted systems: {', '.join(evidence['systems']) or 'none'}",
+    ]
+    if change:
+        lines.append(f"- Proposed change (user-supplied): {change}")
+    lines += [
+        "",
+        "> Potential impact, not a prediction of failure. Only documented metadata dependencies",
+        "> are traversed; missing lineage can hide additional impacts.",
+        "", "## Affected business outputs", "",
+    ]
+    if not evidence["outputs"]:
+        lines += ["No connected business outputs were found in this direction.", ""]
+    for target in evidence["outputs"]:
+        lines += [
+            f"### {target['name']} — {target['kind']} in {target['system']}",
+            f"Shortest documented route: {target['hops']} hops", "",
+        ]
+        for number, path in enumerate(target["paths"], 1):
+            lines += [
+                f"**{'Shortest' if number == 1 else 'Alternative'} Relate path:**", "",
+                arrow.join(f"`{id_}`" for id_ in path["ids"]), "",
+            ]
+            for idx, edge in enumerate(path["edges"]):
+                lines.append(
+                    f"{idx + 1}. `{path['ids'][idx]}` {arrow.strip()} "
+                    f"`{path['ids'][idx + 1]}` — {edge['why']} "
+                    f"(`{edge['mode']}`)"
+                )
+            lines.append("")
+    if evidence["truncated"]:
+        lines += [
+            "**Incomplete enumeration:** the Cypher path cap was reached. "
+            "Do not treat this as an exhaustive impact inventory.", "",
+        ]
+    lines += [
+        "## Verification", "",
+        "Results come from bounded, parameterized Cypher path traversals over the",
+        "persistent embedded Relate store `data/sample.rl`; no LLM guesses or SQL execution.",
+        "The source metadata is synthetic. Review the actual transformation and rule",
+        "implementations before approving a production change.", "",
+    ]
+    return "\n".join(lines)

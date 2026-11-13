@@ -1,0 +1,74 @@
+{
+  "kind": "story-first human-directed editorial cut",
+  "source": "genuine OCI Playwright screen recording and original Relate impact receipt",
+  "music": {
+    "bpm": 102,
+    "key": "A minor",
+    "duration_seconds": 82.774218,
+    "source": "original procedural composition; no external samples",
+    "bytes": 14601420
+  },
+  "voice_engine": "Microsoft Edge Neural TTS",
+  "voice": "en-US-AndrewNeural",
+  "screen_capture_pivots": {
+    "change": 3.7,
+    "path": 15.5,
+    "finance": 29.9,
+    "climate": 43.0,
+    "negative": 63.0
+  },
+  "duration_seconds": 82.792993,
+  "resolution": "1920x1080",
+  "fps": 24,
+  "includes_intro": true,
+  "includes_outro": true,
+  "video_bytes": 3801208,
+  "sha256": "2751be294509bb599a36e0b39fded6fba022646a13b33e323e367d0deba9f799",
+  "scenes": [
+    {
+      "name": "intro",
+      "duration": 6.667,
+      "voice": "Most data problems don't begin with a dramatic failure. They begin with one small change."
+    },
+    {
+      "name": "change",
+      "duration": 9.5,
+      "voice": "Here, a lab field called moisture percent changes from a number out of a hundred to a fraction. The column name stays. Its meaning doesn't."
+    },
+    {
+      "name": "path",
+      "duration": 11.833,
+      "voice": "Data Impact Graph opens a real, embedded Relate database, and follows its Cypher paths. First the assay is normalized. Then dry mass is calculated."
+    },
+    {
+      "name": "fork",
+      "duration": 8.083,
+      "voice": "And now, the interesting part. That same dry-mass calculation feeds two teams that might never speak to each other."
+    },
+    {
+      "name": "finance",
+      "duration": 8.25,
+      "voice": "Finance uses payable dry kilograms to forecast supplier payouts. A quiet unit change can reach the money."
+    },
+    {
+      "name": "climate",
+      "duration": 8.667,
+      "voice": "Climate uses dry tonnes to calculate carbon intensity. The dependency chain reaches the Scope Three assurance dashboard."
+    },
+    {
+      "name": "negative",
+      "duration": 10.25,
+      "voice": "Change the field identifier instead, and neither payout nor carbon is affected. Good lineage analysis needs to know when not to raise the alarm."
+    },
+    {
+      "name": "receipt",
+      "duration": 10.208,
+      "voice": "Before merging, export the impact receipt. It gives a reviewer the affected outputs, actual dependency paths, and why every connection matters."
+    },
+    {
+      "name": "outro",
+      "duration": 9.292,
+      "voice": "One embedded graph. Forty-nine assets. Sixty relationships. Know what breaks before you change it. Data Impact Graph."
+    }
+  ]
+}

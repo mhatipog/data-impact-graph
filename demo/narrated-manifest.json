@@ -1,0 +1,47 @@
+{
+  "source": "committed Playwright capture of real Relate application",
+  "video_seconds": 71.747722,
+  "resolution": "1920x1080",
+  "framerate": 30,
+  "voice": "en-US-AndrewNeural",
+  "voice_engine": "Microsoft Edge Neural TTS",
+  "video_bytes": 5045502,
+  "sha256": "bed52d8b2621e6cf2b5ef80211222fc0120461ea516bee35a986460076faa898",
+  "chapters": [
+    {
+      "key": "hook",
+      "duration": 7.768,
+      "narration": "A lab changes moisture percent from a percentage to a fraction. Sounds routine. But what actually breaks downstream?"
+    },
+    {
+      "key": "paths",
+      "duration": 11.488,
+      "narration": "Data Impact Graph queries Relate, the embedded graph database, for real dependency paths. Follow the moisture measurement into assay normalization and dry mass."
+    },
+    {
+      "key": "esg",
+      "duration": 10.0,
+      "narration": "Keep following the graph. Dry mass becomes the denominator for carbon intensity, which flows into Scope Three assurance. That's the first surprise."
+    },
+    {
+      "key": "payout",
+      "duration": 9.304,
+      "narration": "But the same dry mass also influences supplier payouts. One source column, two very different business teams, and a hidden shared dependency."
+    },
+    {
+      "key": "precision",
+      "duration": 11.272,
+      "narration": "Precision matters. Change an unrelated field identifier instead, and the payout and carbon outputs disappear from the results. No noisy sibling-column assumptions."
+    },
+    {
+      "key": "receipt",
+      "duration": 10.216,
+      "narration": "Before merging, export a change impact receipt. It lists each affected output, the exact graph route, and the reason behind every dependency."
+    },
+    {
+      "key": "close",
+      "duration": 11.656,
+      "narration": "Forty-nine assets. Sixty dependencies. One persistent local Relate graph, with real Cypher traversals. Data Impact Graph. Know what breaks before you change it."
+    }
+  ]
+}

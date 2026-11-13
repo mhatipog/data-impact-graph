@@ -74,9 +74,9 @@ def seed(metadata_path: Path = SAMPLE, store_path: Path = STORE, *, force: bool 
             for edge in metadata["flows"]:
                 db.execute(
                     "MATCH (a:Asset {id: $a}), (b:Asset {id: $b}) "
-                    "CREATE (a)-[:FLOWS_TO {why: $why, mode: $mode}]->(b)",
+                    "CREATE (a)-[:FLOWS_TO {why: $why, mode: $mode, provenance: $provenance}]->(b)",
                     {"a": edge["from"], "b": edge["to"],
-                     "why": edge["why"], "mode": edge["mode"]},
+                     "why": edge["why"], "mode": edge["mode"], "provenance": edge.get("provenance", "")},
                 )
             db.commit()
         except Exception:
@@ -91,12 +91,15 @@ def _asset(n) -> dict:
 
 def overview(store_path: Path = STORE) -> dict:
     with relate.connect(str(store_path), read_only=True) as db:
-        assets = [_asset(r["n"]) for r in db.execute("MATCH (n:Asset) RETURN n ORDER BY n.id LIMIT 250")]
+        assets = [_asset(r["n"]) for r in db.execute("MATCH (n:Asset) RETURN n ORDER BY n.id LIMIT 2000")]
         flows = [dict(r) for r in db.execute(
             "MATCH (a:Asset)-[r:FLOWS_TO]->(b:Asset) "
-            "RETURN a.id AS source, b.id AS target, r.why AS why, r.mode AS mode LIMIT 400"
+            "RETURN a.id AS source, b.id AS target, r.why AS why, r.mode AS mode, "
+            "r.provenance AS provenance LIMIT 4000"
         )]
-    return {"assets": assets, "flows": flows, "store": str(store_path)}
+    return {"assets": assets, "flows": flows, "store": str(store_path),
+            "source": "openlineage" if any(a["id"].startswith("ol:") for a in assets) else "sample",
+            "truncated": len(assets) == 2000 or len(flows) == 4000}
 
 
 def impact(asset_id: str, direction: str = "downstream", store_path: Path = STORE) -> dict:
@@ -125,7 +128,8 @@ def impact(asset_id: str, direction: str = "downstream", store_path: Path = STOR
                 continue
             item["paths"].append({
                 "ids": [n["id"] for n in steps],
-                "edges": [{"why": r.properties.get("why", ""), "mode": r.properties.get("mode", "")}
+                "edges": [{"why": r.properties.get("why", ""), "mode": r.properties.get("mode", ""),
+                           "provenance": r.properties.get("provenance", "")}
                           for r in path.relationships],
             })
     items = sorted(targets.values(), key=lambda a: (a["hops"], a["kind"] not in OUTPUT_KINDS, a["name"]))
@@ -156,7 +160,10 @@ def receipt(asset_id: str, direction: str = "downstream", store_path: Path = STO
         lines.append(f"- Proposed change (user-supplied): {change}")
     upstream_inputs = [asset for asset in evidence["affected"] if asset["kind"] in {"Column", "Rule"}]
     targets = evidence["outputs"] if direction == "downstream" else upstream_inputs
-    section = "Affected business outputs" if direction == "downstream" else "Upstream source fields and business rules"
+    is_openlineage = source["id"].startswith("ol:")
+    if direction == "downstream" and is_openlineage:
+        targets = [asset for asset in evidence["affected"] if asset["kind"] in {"Table", "Column"}]
+    section = ("Downstream datasets and fields requiring review" if is_openlineage else "Affected business outputs") if direction == "downstream" else "Upstream source fields and business rules"
     lines += [
         "",
         "> Potential impact, not a prediction of failure. Only documented metadata dependencies",
@@ -164,7 +171,7 @@ def receipt(asset_id: str, direction: str = "downstream", store_path: Path = STO
         "", f"## {section}", "",
     ]
     if not targets:
-        lines += [("No connected business outputs were found in this direction." if direction == "downstream"
+        lines += [(("No downstream datasets or fields are documented." if is_openlineage else "No connected business outputs were found in this direction.") if direction == "downstream"
                    else "No source fields or rules were found in the documented upstream graph."), ""]
     for target in targets:
         lines += [

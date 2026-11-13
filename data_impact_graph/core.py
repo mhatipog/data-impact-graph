@@ -105,12 +105,6 @@ def impact(asset_id: str, direction: str = "downstream", store_path: Path = STOR
         raise ValueError("direction must be downstream or upstream")
     if len(asset_id) > 240:
         raise ValueError("asset id too long")
-    arrow = "->" if direction == "downstream" else "<-"
-    query = (
-        f"MATCH p = (root:Asset {{id: $id}})-[:FLOWS_TO*1..{MAX_HOPS}]{arrow}(target:Asset) "
-        f"RETURN p ORDER BY length(p) ASC LIMIT {MAX_PATHS}"
-    )
-    # The arrow syntax above is expanded to valid Cypher delimiters below.
     if direction == "downstream":
         query = f"MATCH p = (root:Asset {{id: $id}})-[:FLOWS_TO*1..{MAX_HOPS}]->(target:Asset) RETURN p ORDER BY length(p) ASC LIMIT {MAX_PATHS}"
     else:

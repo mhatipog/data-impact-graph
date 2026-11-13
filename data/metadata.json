@@ -1,0 +1,760 @@
+{
+  "dataset": "Northstar Palm Cooperative \u2014 synthetic multi-system metadata",
+  "description": "All names, fields and rules are fictional; metadata only, no production data.",
+  "assets": [
+    {
+      "id": "sys.field",
+      "name": "FieldOps",
+      "kind": "System",
+      "system": "FieldOps",
+      "detail": "Harvest events from field crews",
+      "risk": ""
+    },
+    {
+      "id": "sys.lab",
+      "name": "LabTrack",
+      "kind": "System",
+      "system": "LabTrack",
+      "detail": "Quality-control assays per delivery lot",
+      "risk": ""
+    },
+    {
+      "id": "sys.erp",
+      "name": "CoreERP",
+      "kind": "System",
+      "system": "CoreERP",
+      "detail": "Price contracts and buying records",
+      "risk": ""
+    },
+    {
+      "id": "sys.fleet",
+      "name": "FleetTrack",
+      "kind": "System",
+      "system": "FleetTrack",
+      "detail": "Vehicle route and haul records",
+      "risk": ""
+    },
+    {
+      "id": "sys.finance",
+      "name": "FinanceMart",
+      "kind": "System",
+      "system": "FinanceMart",
+      "detail": "Supplier settlement and cost model",
+      "risk": ""
+    },
+    {
+      "id": "sys.climate",
+      "name": "ClimateMart",
+      "kind": "System",
+      "system": "ClimateMart",
+      "detail": "Dry-tonnage and Scope 3 accounting",
+      "risk": ""
+    },
+    {
+      "id": "sys.bi",
+      "name": "BoardBI",
+      "kind": "System",
+      "system": "BoardBI",
+      "detail": "Operational and executive decision products",
+      "risk": ""
+    },
+    {
+      "id": "field.harvests",
+      "name": "harvest_events",
+      "kind": "Table",
+      "system": "FieldOps",
+      "detail": "One harvested load per lot",
+      "risk": ""
+    },
+    {
+      "id": "lab.assays",
+      "name": "lot_assays",
+      "kind": "Table",
+      "system": "LabTrack",
+      "detail": "Moisture tests by lot",
+      "risk": ""
+    },
+    {
+      "id": "erp.lots",
+      "name": "purchase_lots",
+      "kind": "Table",
+      "system": "CoreERP",
+      "detail": "Agreed dry-tonnage pricing per lot",
+      "risk": ""
+    },
+    {
+      "id": "fleet.shipments",
+      "name": "shipment_routes",
+      "kind": "Table",
+      "system": "FleetTrack",
+      "detail": "Haul distance by lot",
+      "risk": ""
+    },
+    {
+      "id": "finance.settlement",
+      "name": "supplier_settlements",
+      "kind": "Table",
+      "system": "FinanceMart",
+      "detail": "Calculated, audited supplier settlements",
+      "risk": ""
+    },
+    {
+      "id": "climate.emissions",
+      "name": "scope3_lots",
+      "kind": "Table",
+      "system": "ClimateMart",
+      "detail": "Per-lot carbon activity and intensities",
+      "risk": ""
+    },
+    {
+      "id": "field.harvests.lot_id",
+      "name": "lot_id",
+      "kind": "Column",
+      "system": "FieldOps",
+      "detail": "Stable delivery-lot identifier",
+      "risk": ""
+    },
+    {
+      "id": "field.harvests.gross_kg",
+      "name": "gross_kg",
+      "kind": "Column",
+      "system": "FieldOps",
+      "detail": "Truck scale measurement before drying",
+      "risk": "high"
+    },
+    {
+      "id": "field.harvests.field_id",
+      "name": "field_id",
+      "kind": "Column",
+      "system": "FieldOps",
+      "detail": "Field identifier for yield grouping",
+      "risk": ""
+    },
+    {
+      "id": "lab.assays.lot_id",
+      "name": "lot_id",
+      "kind": "Column",
+      "system": "LabTrack",
+      "detail": "Assay join to harvest lot",
+      "risk": ""
+    },
+    {
+      "id": "lab.assays.moisture_pct",
+      "name": "moisture_pct",
+      "kind": "Column",
+      "system": "LabTrack",
+      "detail": "Wet-basis percent in [0,100]; affects payable dry weight",
+      "risk": "critical"
+    },
+    {
+      "id": "erp.lots.price_per_dry_kg",
+      "name": "price_per_dry_kg",
+      "kind": "Column",
+      "system": "CoreERP",
+      "detail": "Contract price per kilogram of dry material",
+      "risk": "high"
+    },
+    {
+      "id": "fleet.shipments.distance_km",
+      "name": "distance_km",
+      "kind": "Column",
+      "system": "FleetTrack",
+      "detail": "Distance of vehicle leg",
+      "risk": ""
+    },
+    {
+      "id": "fleet.shipments.lot_id",
+      "name": "lot_id",
+      "kind": "Column",
+      "system": "FleetTrack",
+      "detail": "Shipment join to harvest lot",
+      "risk": ""
+    },
+    {
+      "id": "finance.settlement.payable_kg",
+      "name": "payable_dry_kg",
+      "kind": "Column",
+      "system": "FinanceMart",
+      "detail": "Dry mass after moisture correction",
+      "risk": "high"
+    },
+    {
+      "id": "finance.settlement.payout_eur",
+      "name": "payout_eur",
+      "kind": "Column",
+      "system": "FinanceMart",
+      "detail": "Contract price multiplied by payable dry kg",
+      "risk": "critical"
+    },
+    {
+      "id": "climate.emissions.dry_tonnes",
+      "name": "dry_tonnes",
+      "kind": "Column",
+      "system": "ClimateMart",
+      "detail": "Dry tonnes for emissions intensity denominator",
+      "risk": "high"
+    },
+    {
+      "id": "climate.emissions.kg_co2e",
+      "name": "kg_co2e",
+      "kind": "Column",
+      "system": "ClimateMart",
+      "detail": "Transport and processing CO2 equivalent",
+      "risk": "high"
+    },
+    {
+      "id": "rule.dry_mass",
+      "name": "Dry-mass policy v3",
+      "kind": "Rule",
+      "system": "FinanceMart",
+      "detail": "dry_kg = gross_kg \u00d7 (1 \u2212 moisture_pct / 100)",
+      "risk": ""
+    },
+    {
+      "id": "rule.transport_factor",
+      "name": "Transport emission factor",
+      "kind": "Rule",
+      "system": "ClimateMart",
+      "detail": "kg CO2e per kilometre by vehicle class",
+      "risk": ""
+    },
+    {
+      "id": "rule.quality",
+      "name": "Moisture acceptance threshold",
+      "kind": "Rule",
+      "system": "LabTrack",
+      "detail": "Flags lots above the acceptable moisture threshold",
+      "risk": ""
+    },
+    {
+      "id": "tx.normalize_assay",
+      "name": "Normalize lab assay",
+      "kind": "Transformation",
+      "system": "LabTrack",
+      "detail": "Convert LabTrack percentage to normalized ratio",
+      "risk": ""
+    },
+    {
+      "id": "tx.dry_mass",
+      "name": "Calculate dry mass",
+      "kind": "Transformation",
+      "system": "FinanceMart",
+      "detail": "Join harvest and assay on lot_id; apply versioned formula",
+      "risk": ""
+    },
+    {
+      "id": "tx.payout",
+      "name": "Calculate supplier payout",
+      "kind": "Transformation",
+      "system": "FinanceMart",
+      "detail": "Price payable kilograms under the current contract",
+      "risk": ""
+    },
+    {
+      "id": "tx.emissions",
+      "name": "Calculate carbon intensity",
+      "kind": "Transformation",
+      "system": "ClimateMart",
+      "detail": "Normalize emissions by dry tonnes",
+      "risk": ""
+    },
+    {
+      "id": "tx.transport",
+      "name": "Calculate transport emissions",
+      "kind": "Transformation",
+      "system": "ClimateMart",
+      "detail": "Distance multiplied by approved emission factor",
+      "risk": ""
+    },
+    {
+      "id": "tx.yield",
+      "name": "Calculate field productivity",
+      "kind": "Transformation",
+      "system": "FieldOps",
+      "detail": "Gross tonnes per field and harvest window",
+      "risk": ""
+    },
+    {
+      "id": "tx.quality",
+      "name": "Evaluate lot acceptance",
+      "kind": "Transformation",
+      "system": "LabTrack",
+      "detail": "Moisture threshold decision for lots",
+      "risk": ""
+    },
+    {
+      "id": "model.settlement",
+      "name": "Supplier settlement model",
+      "kind": "Model",
+      "system": "FinanceMart",
+      "detail": "Fact at lot level with payable dry kilograms and euro payout",
+      "risk": ""
+    },
+    {
+      "id": "model.scope3",
+      "name": "Scope 3 activity model",
+      "kind": "Model",
+      "system": "ClimateMart",
+      "detail": "Per-lot emissions and dry-tonnage intensity",
+      "risk": ""
+    },
+    {
+      "id": "model.harvest",
+      "name": "Field productivity model",
+      "kind": "Model",
+      "system": "FieldOps",
+      "detail": "Yield by field, week and crew",
+      "risk": ""
+    },
+    {
+      "id": "model.margin",
+      "name": "Commercial performance model",
+      "kind": "Model",
+      "system": "BoardBI",
+      "detail": "Payout cost joined to shipment value",
+      "risk": ""
+    },
+    {
+      "id": "model.quality",
+      "name": "Quality exceptions model",
+      "kind": "Model",
+      "system": "LabTrack",
+      "detail": "Assay acceptance counts and exceptions",
+      "risk": ""
+    },
+    {
+      "id": "metric.payout",
+      "name": "Supplier payout forecast",
+      "kind": "Metric",
+      "system": "FinanceMart",
+      "detail": "Forecast settlement liabilities in EUR",
+      "risk": "high"
+    },
+    {
+      "id": "metric.carbon",
+      "name": "CO2e per dry tonne",
+      "kind": "Metric",
+      "system": "ClimateMart",
+      "detail": "Executive sustainability intensity measure",
+      "risk": "high"
+    },
+    {
+      "id": "metric.yield",
+      "name": "Harvest tonnes per hectare",
+      "kind": "Metric",
+      "system": "FieldOps",
+      "detail": "Field productivity by harvest window",
+      "risk": "high"
+    },
+    {
+      "id": "metric.margin",
+      "name": "Contribution margin",
+      "kind": "Metric",
+      "system": "BoardBI",
+      "detail": "Commercial performance after dry-mass-adjusted payouts",
+      "risk": "high"
+    },
+    {
+      "id": "metric.quality",
+      "name": "Assay rejection rate",
+      "kind": "Metric",
+      "system": "LabTrack",
+      "detail": "Proportion of loads exceeding moisture threshold",
+      "risk": "high"
+    },
+    {
+      "id": "dash.supplier",
+      "name": "Supplier 360",
+      "kind": "Dashboard",
+      "system": "BoardBI",
+      "detail": "Supplier payment exposure and contracts",
+      "risk": "high"
+    },
+    {
+      "id": "dash.esg",
+      "name": "Scope 3 assurance",
+      "kind": "Dashboard",
+      "system": "BoardBI",
+      "detail": "ESG audit disclosures and executive sustainability reporting",
+      "risk": "high"
+    },
+    {
+      "id": "dash.field",
+      "name": "Field performance",
+      "kind": "Dashboard",
+      "system": "BoardBI",
+      "detail": "Harvest operations and yields",
+      "risk": "high"
+    },
+    {
+      "id": "dash.exec",
+      "name": "Executive cockpit",
+      "kind": "Dashboard",
+      "system": "BoardBI",
+      "detail": "Finance, quality and Scope 3 metrics on one board",
+      "risk": "high"
+    }
+  ],
+  "flows": [
+    {
+      "from": "sys.field",
+      "to": "field.harvests",
+      "why": "System outage or contract change can affect this table",
+      "mode": "scope"
+    },
+    {
+      "from": "sys.lab",
+      "to": "lab.assays",
+      "why": "System outage or contract change can affect this table",
+      "mode": "scope"
+    },
+    {
+      "from": "sys.erp",
+      "to": "erp.lots",
+      "why": "System outage or contract change can affect this table",
+      "mode": "scope"
+    },
+    {
+      "from": "sys.fleet",
+      "to": "fleet.shipments",
+      "why": "System outage or contract change can affect this table",
+      "mode": "scope"
+    },
+    {
+      "from": "sys.finance",
+      "to": "finance.settlement",
+      "why": "System outage or contract change can affect this table",
+      "mode": "scope"
+    },
+    {
+      "from": "sys.climate",
+      "to": "climate.emissions",
+      "why": "System outage or contract change can affect this table",
+      "mode": "scope"
+    },
+    {
+      "from": "field.harvests",
+      "to": "field.harvests.lot_id",
+      "why": "Table availability and schema cover lot_id",
+      "mode": "scope"
+    },
+    {
+      "from": "field.harvests",
+      "to": "field.harvests.gross_kg",
+      "why": "Table availability and schema cover gross_kg",
+      "mode": "scope"
+    },
+    {
+      "from": "field.harvests",
+      "to": "field.harvests.field_id",
+      "why": "Table availability and schema cover field_id",
+      "mode": "scope"
+    },
+    {
+      "from": "lab.assays",
+      "to": "lab.assays.lot_id",
+      "why": "Table availability and schema cover lot_id",
+      "mode": "scope"
+    },
+    {
+      "from": "lab.assays",
+      "to": "lab.assays.moisture_pct",
+      "why": "Table availability and schema cover moisture_pct",
+      "mode": "scope"
+    },
+    {
+      "from": "erp.lots",
+      "to": "erp.lots.price_per_dry_kg",
+      "why": "Table availability and schema cover price_per_dry_kg",
+      "mode": "scope"
+    },
+    {
+      "from": "fleet.shipments",
+      "to": "fleet.shipments.distance_km",
+      "why": "Table availability and schema cover distance_km",
+      "mode": "scope"
+    },
+    {
+      "from": "fleet.shipments",
+      "to": "fleet.shipments.lot_id",
+      "why": "Table availability and schema cover lot_id",
+      "mode": "scope"
+    },
+    {
+      "from": "finance.settlement",
+      "to": "finance.settlement.payable_kg",
+      "why": "Table availability and schema cover payable_kg",
+      "mode": "scope"
+    },
+    {
+      "from": "finance.settlement",
+      "to": "finance.settlement.payout_eur",
+      "why": "Table availability and schema cover payout_eur",
+      "mode": "scope"
+    },
+    {
+      "from": "climate.emissions",
+      "to": "climate.emissions.dry_tonnes",
+      "why": "Table availability and schema cover dry_tonnes",
+      "mode": "scope"
+    },
+    {
+      "from": "climate.emissions",
+      "to": "climate.emissions.kg_co2e",
+      "why": "Table availability and schema cover kg_co2e",
+      "mode": "scope"
+    },
+    {
+      "from": "lab.assays.moisture_pct",
+      "to": "tx.normalize_assay",
+      "why": "Assay ratio is read as the dry-mass adjustment input",
+      "mode": "derive"
+    },
+    {
+      "from": "lab.assays.lot_id",
+      "to": "tx.dry_mass",
+      "why": "Lot identifier joins assay to harvest",
+      "mode": "derive"
+    },
+    {
+      "from": "field.harvests.lot_id",
+      "to": "tx.dry_mass",
+      "why": "Lot identifier joins harvest to assay",
+      "mode": "derive"
+    },
+    {
+      "from": "field.harvests.gross_kg",
+      "to": "tx.dry_mass",
+      "why": "Gross mass is the numerator before moisture correction",
+      "mode": "derive"
+    },
+    {
+      "from": "tx.normalize_assay",
+      "to": "tx.dry_mass",
+      "why": "Normalized moisture ratio changes dry mass",
+      "mode": "derive"
+    },
+    {
+      "from": "rule.dry_mass",
+      "to": "tx.dry_mass",
+      "why": "Dry-mass formula is applied at settlement time",
+      "mode": "derive"
+    },
+    {
+      "from": "tx.dry_mass",
+      "to": "finance.settlement.payable_kg",
+      "why": "Computed payable dry kilograms are materialized",
+      "mode": "derive"
+    },
+    {
+      "from": "tx.dry_mass",
+      "to": "climate.emissions.dry_tonnes",
+      "why": "Same dry-mass calculation also feeds climate accounting",
+      "mode": "derive"
+    },
+    {
+      "from": "finance.settlement.payable_kg",
+      "to": "tx.payout",
+      "why": "Dry kilograms set the supplier settlement volume",
+      "mode": "derive"
+    },
+    {
+      "from": "erp.lots.price_per_dry_kg",
+      "to": "tx.payout",
+      "why": "Contract price sets the euro value",
+      "mode": "derive"
+    },
+    {
+      "from": "tx.payout",
+      "to": "finance.settlement.payout_eur",
+      "why": "Settlement transaction stores computed payout",
+      "mode": "derive"
+    },
+    {
+      "from": "fleet.shipments.distance_km",
+      "to": "tx.transport",
+      "why": "Distance drives transport emissions",
+      "mode": "derive"
+    },
+    {
+      "from": "fleet.shipments.lot_id",
+      "to": "tx.transport",
+      "why": "Shipment emissions are attributed to their lot",
+      "mode": "derive"
+    },
+    {
+      "from": "rule.transport_factor",
+      "to": "tx.transport",
+      "why": "Approved CO2e factor is applied",
+      "mode": "derive"
+    },
+    {
+      "from": "tx.transport",
+      "to": "climate.emissions.kg_co2e",
+      "why": "Transport emissions materialize per lot",
+      "mode": "derive"
+    },
+    {
+      "from": "climate.emissions.dry_tonnes",
+      "to": "tx.emissions",
+      "why": "Dry tonnes form the emissions-intensity denominator",
+      "mode": "derive"
+    },
+    {
+      "from": "climate.emissions.kg_co2e",
+      "to": "tx.emissions",
+      "why": "CO2e numerator is attributed to each lot",
+      "mode": "derive"
+    },
+    {
+      "from": "field.harvests.gross_kg",
+      "to": "tx.yield",
+      "why": "Gross weight is used for field operational yield",
+      "mode": "derive"
+    },
+    {
+      "from": "field.harvests.field_id",
+      "to": "tx.yield",
+      "why": "Field identifier is the aggregation key",
+      "mode": "derive"
+    },
+    {
+      "from": "lab.assays.moisture_pct",
+      "to": "tx.quality",
+      "why": "Moisture measurement controls quality acceptance",
+      "mode": "derive"
+    },
+    {
+      "from": "rule.quality",
+      "to": "tx.quality",
+      "why": "Quality threshold controls the decision",
+      "mode": "derive"
+    },
+    {
+      "from": "finance.settlement.payable_kg",
+      "to": "model.settlement",
+      "why": "Settlement model exposes payable dry kilograms",
+      "mode": "publish"
+    },
+    {
+      "from": "finance.settlement.payout_eur",
+      "to": "model.settlement",
+      "why": "Settlement model includes payout amounts",
+      "mode": "publish"
+    },
+    {
+      "from": "tx.emissions",
+      "to": "model.scope3",
+      "why": "Carbon intensity transformation feeds scope 3 model",
+      "mode": "publish"
+    },
+    {
+      "from": "tx.yield",
+      "to": "model.harvest",
+      "why": "Productivity aggregations feed field model",
+      "mode": "publish"
+    },
+    {
+      "from": "finance.settlement.payout_eur",
+      "to": "model.margin",
+      "why": "Supplier payout is included as cost in the margin model",
+      "mode": "publish"
+    },
+    {
+      "from": "tx.quality",
+      "to": "model.quality",
+      "why": "Acceptance flags are aggregated into exceptions",
+      "mode": "publish"
+    },
+    {
+      "from": "model.settlement",
+      "to": "metric.payout",
+      "why": "Aggregates payables per settlement period",
+      "mode": "aggregate"
+    },
+    {
+      "from": "model.scope3",
+      "to": "metric.carbon",
+      "why": "Calculates emissions intensity by period",
+      "mode": "aggregate"
+    },
+    {
+      "from": "model.harvest",
+      "to": "metric.yield",
+      "why": "Normalizes harvest yield by field area",
+      "mode": "aggregate"
+    },
+    {
+      "from": "model.margin",
+      "to": "metric.margin",
+      "why": "Calculates contribution after supplier payouts",
+      "mode": "aggregate"
+    },
+    {
+      "from": "model.quality",
+      "to": "metric.quality",
+      "why": "Calculates acceptance and rejection rate",
+      "mode": "aggregate"
+    },
+    {
+      "from": "sys.bi",
+      "to": "dash.supplier",
+      "why": "BoardBI publishes supplier decision product",
+      "mode": "publish"
+    },
+    {
+      "from": "sys.bi",
+      "to": "dash.esg",
+      "why": "BoardBI publishes Scope 3 product",
+      "mode": "publish"
+    },
+    {
+      "from": "sys.bi",
+      "to": "dash.field",
+      "why": "BoardBI publishes field-operations product",
+      "mode": "publish"
+    },
+    {
+      "from": "sys.bi",
+      "to": "dash.exec",
+      "why": "BoardBI publishes executive product",
+      "mode": "publish"
+    },
+    {
+      "from": "metric.payout",
+      "to": "dash.supplier",
+      "why": "Supplier dashboard renders payout forecast",
+      "mode": "publish"
+    },
+    {
+      "from": "metric.carbon",
+      "to": "dash.esg",
+      "why": "ESG dashboard renders carbon intensity",
+      "mode": "publish"
+    },
+    {
+      "from": "metric.yield",
+      "to": "dash.field",
+      "why": "Field dashboard renders field yield",
+      "mode": "publish"
+    },
+    {
+      "from": "metric.margin",
+      "to": "dash.exec",
+      "why": "Executive board renders margin",
+      "mode": "publish"
+    },
+    {
+      "from": "metric.carbon",
+      "to": "dash.exec",
+      "why": "Executive board renders Scope 3 intensity",
+      "mode": "publish"
+    },
+    {
+      "from": "metric.quality",
+      "to": "dash.exec",
+      "why": "Executive board renders quality exceptions",
+      "mode": "publish"
+    }
+  ]
+}

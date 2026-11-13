@@ -164,7 +164,7 @@ def render_scene(s, still, audio, target):
     # A slight camera push combines with cuts between areas. Old large recording
     # captions sit at the bottom of the source: the crop favors the app above them.
     lens=f"crop=1120:630:{x}:{y},zoompan=z='min(zoom+0.0004,1.12)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s={VIDEO_W}x{VIDEO_H}:fps={FPS}"
-    graph=(f"[0:v]fps={FPS},setpts={target_length/source_length:.7f}*(PTS-STARTPTS),"
+    graph=(f"[0:v]setpts={target_length/source_length:.7f}*(PTS-STARTPTS),fps={FPS},"
            f"{lens},setsar=1,format=yuv420p,tpad=stop_mode=clone:stop_duration=1[v];"
            f"[1:v][v]overlay={VIDEO_X}:{VIDEO_Y}:shortest=0:format=auto,"
            f"format=yuv420p[out]")

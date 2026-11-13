@@ -6,7 +6,6 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { chromium } from 'playwright';
 import ffmpegBinary from '@ffmpeg-installer/ffmpeg';
-import ffprobeBinary from '@ffprobe-installer/ffprobe';
 
 const base = process.env.DEMO_URL || 'http://127.0.0.1:8765';
 const output = path.resolve(process.argv[2] || 'demo/output');
@@ -130,10 +129,14 @@ try {
     '-r','24','-movflags','+faststart',mp4
   ], {encoding:'utf8',timeout:180000});
   if (ff.status !== 0) throw new Error('FFmpeg conversion failed: ' + ff.stderr);
-  const probe = spawnSync(ffprobeBinary.path, ['-v','error','-show_entries','format=duration,size','-of','json',mp4], {encoding:'utf8'});
-  if (probe.status !== 0) throw new Error('FFprobe failed: ' + probe.stderr);
-  const info = JSON.parse(probe.stdout);
-  const duration = Number(info.format.duration);
+  // The npm FFprobe package may lack an arm64 executable. Use the working FFmpeg
+  // binary both to decode-check the first frame and read container duration.
+  const probe = spawnSync(ffmpegBinary.path, ['-hide_banner','-i',mp4,'-t','0.2','-f','null','-'],
+    {encoding:'utf8',timeout:30000});
+  if (probe.status !== 0) throw new Error('FFmpeg container check failed: ' + (probe.stderr || probe.error));
+  const timecode = /Duration:\s*(\d{2}):(\d{2}):([\d.]+)/.exec(probe.stderr);
+  if (!timecode) throw new Error('Could not identify MP4 duration: ' + probe.stderr.slice(0,500));
+  const duration = Number(timecode[1]) * 3600 + Number(timecode[2]) * 60 + Number(timecode[3]);
   assert(duration >= 85 && duration <= 125, 'Unexpected demo duration ' + duration);
   const bytes = (await stat(mp4)).size;
   assert(bytes > 100000 && bytes < 30000000, 'Unreasonable output size ' + bytes);

@@ -154,15 +154,19 @@ def receipt(asset_id: str, direction: str = "downstream", store_path: Path = STO
     ]
     if change:
         lines.append(f"- Proposed change (user-supplied): {change}")
+    upstream_inputs = [asset for asset in evidence["affected"] if asset["kind"] in {"Column", "Rule"}]
+    targets = evidence["outputs"] if direction == "downstream" else upstream_inputs
+    section = "Affected business outputs" if direction == "downstream" else "Upstream source fields and business rules"
     lines += [
         "",
         "> Potential impact, not a prediction of failure. Only documented metadata dependencies",
         "> are traversed; missing lineage can hide additional impacts.",
-        "", "## Affected business outputs", "",
+        "", f"## {section}", "",
     ]
-    if not evidence["outputs"]:
-        lines += ["No connected business outputs were found in this direction.", ""]
-    for target in evidence["outputs"]:
+    if not targets:
+        lines += [("No connected business outputs were found in this direction." if direction == "downstream"
+                   else "No source fields or rules were found in the documented upstream graph."), ""]
+    for target in targets:
         lines += [
             f"### {target['name']} — {target['kind']} in {target['system']}",
             f"Shortest documented route: {target['hops']} hops", "",

@@ -1,0 +1,2 @@
+openlineage-python>=1.45,<2
+sqlglot>=26,<35

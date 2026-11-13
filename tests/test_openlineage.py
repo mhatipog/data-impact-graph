@@ -139,7 +139,7 @@ class OpenLineageTests(unittest.TestCase):
         second = mapped("job1", "raw.two", "marts.result", "value", "second",
                         day="2026-11-02T00:00:00Z")
         state = self.ingest([second])
-        self.assertEqual(state["updated_snapshots"], 2)  # output schema + job output
+        self.assertGreaterEqual(state["updated_snapshots"], 3)  # source, output and lineage
         self.assertTrue(state["flows"] >= 2)
         old = impact(_ident("col", NS, "raw.one", "first"), store_path=self.store)
         self.assertNotIn(_ident("col", NS, "marts.result", "value"),
